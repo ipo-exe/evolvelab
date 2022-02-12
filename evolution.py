@@ -129,20 +129,41 @@ def evolve_2d_function(lo, hi,
                        genesize=10,
                        mutrate=0.1,
                        elitism=False,
-                       trace=False):
+                       trace=False,
+                       kind='rastrigin'):
+    """
+
+    :param lo:
+    :param hi:
+    :param generations:
+    :param popsize:
+    :param genesize:
+    :param mutrate:
+    :param elitism:
+    :param trace:
+    :return:
+    """
     from datetime import datetime
-    from benchmark import griewank_2d, sphere_2d, rastrigin_2d
     from code import decode_binary_float
+    if kind == 'rastrigin':
+        from benchmark import rastrigin_2d
+    elif kind == 'sphere':
+        from benchmark import sphere_2d
+    elif kind == 'himmelblaus':
+        from benchmark import himmelblaus
     # get 2d center
     mid = (hi - lo) / 2
-    #
+
     # set random state
     seed = int(str(datetime.now())[-6:])
-    #
+
     # get seeds
     seeds = np.random.randint(100, 1000, size=generations + 1)
-    print('Seeds:, {}'.format(seeds))
-    #
+
+    # declare curve dataframe
+    evolution_curve = pd.DataFrame({'Gen': np.arange(0, generations)})
+    evolution_curve['Best_S'] = 0.0
+
     # generate initial population with popsize
     dnasize = 2
     parents = generate_population(genesize=genesize, dnasize=dnasize, popsize=popsize, randseed=seeds[0])
@@ -150,12 +171,12 @@ def evolve_2d_function(lo, hi,
     if trace:
         traced = np.zeros(shape=(generations, popsize, dnasize, genesize), dtype='int16')
         traced_scores = np.zeros(shape=(generations, popsize))
-    #
+
     # evaluate initial population fitness scores
-    #
+
     # -- deploy scores array
     scores = np.zeros(popsize, dtype='float16')
-    #
+
     # -- evaluate each solution
     for i in range(popsize):
         #
@@ -164,14 +185,23 @@ def evolve_2d_function(lo, hi,
         lcl_y = decode_binary_float(gene=parents[i][1], lo=lo, hi=hi)
         #
         # -- compute local score
-        scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+        if kind == 'rastrigin':
+            scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+        elif kind == 'sphere':
+            scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+        elif kind == 'himmelblaus':
+            scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+
+
     # -- evolve generations
     for g in range(generations):
-        print('\n\nGeneration {}'.format(g))
+        #print('\n\nGeneration {}'.format(g))
+        # store best score
+        evolution_curve['Best_S'].values[g] = np.max(scores)
         if trace:
             traced[g] = parents.copy()
             traced_scores[g] = scores.copy()
-        #
+
         # generate offspring using mating pool ids and parents
         for i in range(0, popsize - 1, 2):
             for j in range(dnasize):
@@ -189,11 +219,11 @@ def evolve_2d_function(lo, hi,
                 # insert in offspring array:
                 offspring[i][j] = mutant_gene_a
                 offspring[i + 1][j] = mutant_gene_b
-        #
+
         # evaluate offspring
         # -- deploy scores array
         off_scores = np.zeros(popsize, dtype='float16')
-        #
+
         # -- evaluate each solution
         for i in range(popsize):
             #
@@ -202,16 +232,25 @@ def evolve_2d_function(lo, hi,
             lcl_y = decode_binary_float(gene=offspring[i][1], lo=lo, hi=hi)
             #
             # -- compute local score
-            off_scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
-        #
+            if kind == 'rastrigin':
+                off_scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+            elif kind == 'sphere':
+                off_scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+            elif kind == 'himmelblaus':
+                scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+
         # merge offspring with parents
         pool = np.append(parents, offspring, axis=0)
         pool_scores = np.append(scores, off_scores)
-        #
+
         # select new parents generation from
         # -- selection method
         if elitism:
-            print('code')
+            # sort pool
+            lcl_df = pd.DataFrame({'S': pool_scores})
+            lcl_df = lcl_df.sort_values(by='S', ascending=False)
+            # slice a popsize sample
+            pool_ids = np.array(lcl_df.index)[:popsize]
         else:  # RWS
             # -- compute pscores
             fscores = fuzzy_transition(array=pool_scores,
@@ -221,15 +260,24 @@ def evolve_2d_function(lo, hi,
                                        ascending=True)
             pool_pscores = fscores / np.sum(fscores)
             pool_ids = rws(pscores=pool_pscores, samplesize=popsize, randseed=seeds[g + 1])
-        # retrieve parents from pool:
+
+        # retrieve parents and scores from pool:
         for i in range(popsize):
             parents[i] = pool[pool_ids[i]]
             scores[i] = pool_scores[pool_ids[i]]
-        print('Best score: {}'.format(np.max(scores)))
-    print('return last generation')
+
+    # return best solution
+    last_best_score = np.max(scores)
+    for i in range(popsize):
+        if scores[i] == last_best_score:
+            last_best_score_id = i
+    best_x = decode_binary_float(gene=parents[last_best_score_id][0], lo=lo, hi=hi)
+    best_y = decode_binary_float(gene=parents[last_best_score_id][1], lo=lo, hi=hi)
+
+    # return data
+    out_dct = {'Curve': evolution_curve, 'X': best_x, 'Y': best_y}
     if trace:
         traced_solutions = np.zeros(shape=(generations, dnasize, popsize))
-
         aux_dct = dict()
         for g in range(generations):
             # express solutions
@@ -239,7 +287,8 @@ def evolve_2d_function(lo, hi,
             aux_dct['G'+ str(g) + '_x'] = traced_solutions[g][0]
             aux_dct['G' + str(g) + '_y'] = traced_solutions[g][1]
             aux_dct['G' + str(g) + '_S'] = traced_scores[g]
-        out_df = pd.DataFrame(aux_dct)
-    return out_df
+        out_dct['Traced'] = pd.DataFrame(aux_dct)
+
+    return out_dct
 
 

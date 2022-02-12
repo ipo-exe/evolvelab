@@ -1,3 +1,7 @@
+"""
+Module to store benchmark functions
+
+"""
 import numpy as np
 
 
@@ -17,7 +21,7 @@ def griewank_2d(x, y, x0=50, y0=50, level=4):
     return level - (((np.square(x) + np.square(y)) / 4000) - (np.cos(x) * np.cos(y / np.sqrt(2))) + 1)
 
 
-def sphere_2d(x, y, x0=50, y0=50, level=5000):
+def sphere_2d(x, y, x0=50, y0=50, level=100):
     """
     (upside down by level)
     :param x:
@@ -41,3 +45,8 @@ def rastrigin_2d(x, y, x0=50, y0=50, level=100):
                     (np.square(x) - 10 * np.cos(2 * np.pi * x))
                     + (np.square(y) - 10 * np.cos(2 * np.pi * y)))
 
+def himmelblaus(x, y, x0=50, y0=50, level=100):
+    # set center
+    x = x - x0
+    y = y - y0
+    return level - (np.square(np.square(x) + y - 11) + np.square(x + np.square(y) - 7))
