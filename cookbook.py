@@ -23,7 +23,7 @@ def evolution_2d_recipe():
 
     # load parameters
     folder = '/home/ipora/Documents/bin'
-    kind = 'sphere' #'rastrigin' #'himmelblaus'
+    kind = 'himmelblaus' #'paraboloid' #'rastrigin' #'himmelblaus'
     wkpl = True
     label = kind
     # folder setup
@@ -31,27 +31,32 @@ def evolution_2d_recipe():
         if label != '':
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
-    generations = 20
-    lo = 0
-    hi = 10
-    popsize = 2000
+    generations = 10
+    lo_x = 3
+    hi_x = 7
+    lo_y = 0
+    hi_y = 10
+    mid = 5.0
+    popsize = 500
     genesize = 12
     mutrate = 0.5
-    elite = True
+    elite = False
     trace = True
 
-    out = evolve_2d_function(lo=lo,
-                             hi=hi,
+    out = evolve_2d_function(lo_x=lo_x,
+                             hi_x=hi_x,
+                             mid_x=mid,
+                             lo_y=lo_y,
+                             hi_y=hi_y,
+                             mid_y=mid,
                              generations=generations,
                              popsize=popsize,
                              genesize=genesize,
                              mutrate=mutrate,
                              elitism=elite,
                              trace=trace,
-                             kind=kind)
-
-    print(out['X'])
-    print(out['Y'])
+                             kind=kind,
+                             tui=True)
 
     curve_df = out['Curve']
     fig = plt.figure(figsize=(7, 5), )  # Width, Height
@@ -63,36 +68,39 @@ def evolution_2d_recipe():
     plt.close(fig)
 
     if trace:
+        lo = 0
+        hi = 10
         if kind == 'rastrigin':
             from benchmark import rastrigin_2d
-        elif kind == 'sphere':
-            from benchmark import sphere_2d
+        elif kind == 'paraboloid':
+            from benchmark import paraboloid_2d
         elif kind == 'himmelblaus':
             from benchmark import himmelblaus
         else:
-            from benchmark import sphere_2d
+            from benchmark import paraboloid_2d
         trace_df = out['Traced']
+        density = 500
+        mid = (hi - lo) / 2
+        # get background image
+        xs = np.linspace(lo, hi, density)
+        ys = np.linspace(lo, hi, density)
+        zs = np.zeros(shape=(len(ys), len(xs)))
+        for i in range(len(ys)):
+            lcl_y = ys[i]
+            for j in range(len(xs)):
+                lcl_x = xs[j]
+                # -- compute local score
+                if kind == 'rastrigin':
+                    zs[i][j] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                elif kind == 'paraboloid':
+                    zs[i][j] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                elif kind == 'himmelblaus':
+                    zs[i][j] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                else:
+                    zs[i][j] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
         for g in range(generations):
             # plot images
             status('plot {}'.format(g))
-            density = 500
-            mid = (hi - lo) / 2
-            xs = np.linspace(lo, hi, density)
-            ys = np.linspace(lo, hi, density)
-            zs = np.zeros(shape=(len(ys), len(xs)))
-            for i in range(len(ys)):
-                lcl_y = ys[i]
-                for j in range(len(xs)):
-                    lcl_x = xs[j]
-                    # -- compute local score
-                    if kind == 'rastrigin':
-                        zs[i][j] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
-                    elif kind == 'sphere':
-                        zs[i][j] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
-                    elif kind == 'himmelblaus':
-                        zs[i][j] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
-                    else:
-                        zs[i][j] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
             # plot
             fig = plt.figure(figsize=(6, 6), )  # Width, Height
             plt.title('Generation: {}'.format(g))
@@ -114,7 +122,7 @@ def evolution_2d_recipe():
             plt.close(fig)
         status('plotting gif')
         png_dir = folder
-        gifname = png_dir + '/animation.gif'
+        gifname = png_dir + '/spoiler.gif'
         images = []
         for file_name in sorted(os.listdir(png_dir)):
             if file_name.endswith('.png') and file_name.startswith('G'):

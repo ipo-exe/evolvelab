@@ -123,39 +123,69 @@ def generate_population(genesize=10, dnasize=10, popsize=10, randseed=100):
     return _pop
 
 
-def evolve_2d_function(lo, hi,
+def evolve_2d_function(lo_x, hi_x, lo_y, hi_y, mid_x, mid_y,
                        generations=10,
                        popsize=10,
                        genesize=10,
                        mutrate=0.1,
                        elitism=False,
                        trace=False,
-                       kind='rastrigin'):
+                       kind='rastrigin',
+                       tui=False):
     """
 
-    :param lo:
-    :param hi:
-    :param generations:
-    :param popsize:
-    :param genesize:
-    :param mutrate:
-    :param elitism:
-    :param trace:
-    :return:
+    2-D evolutionary algorithm.
+
+    Pseudo-code:
+    start
+        get popsize
+        get generations
+        get elitism
+        generate parents with popsize
+        evaluate parents fitness scores
+        set g = 0
+        repeat until g > generations:
+            generate offspring using parents
+            evaluate offspring fitness scores
+            merge offspring with parents in pool
+            select next generation parents from pool
+            if elitism == True:
+                sort pool by fitness scores
+                select the best popsize sample
+            else:
+                select from pool a popsize sample using RWS method
+            set parents = sample
+            set g = g + 1
+        return parents
+    end
+
+    :param lo_x: float of x lowest search space
+    :param hi_x: float of x highest search space
+    :param lo_y: float of y lowest search space
+    :param hi_y: float of y highest search space
+    :param mid_x: float center of x
+    :param mid_y: float center of y
+    :param generations: int number of generations
+    :param popsize: int number of population size
+    :param genesize: int number of gene bits
+    :param mutrate: float 0 to 1 - mutation rate probability
+    :param elitism: boolean to use deterministic elitist selection
+    :param trace: boolean to trace back the full evolution
+    :param kind: string of 2d benchmark function type
+    :param tui: boolean to screen display
+    :return: output dictionary
     """
     from datetime import datetime
+    from backend import status
     from code import decode_binary_float
     if kind == 'rastrigin':
         from benchmark import rastrigin_2d
-    elif kind == 'sphere':
-        from benchmark import sphere_2d
+    elif kind == 'paraboloid':
+        from benchmark import paraboloid_2d
     elif kind == 'himmelblaus':
         from benchmark import himmelblaus
     else:
-        from benchmark import sphere_2d
-    # get 2d center
-    mid = (hi - lo) / 2
-
+        from benchmark import paraboloid_2d
     # set random state
     seed = int(str(datetime.now())[-6:])
 
@@ -181,32 +211,33 @@ def evolve_2d_function(lo, hi,
 
     # -- evaluate each solution
     for i in range(popsize):
-        #
+
         # -- decode y and x
-        lcl_x = decode_binary_float(gene=parents[i][0], lo=lo, hi=hi)
-        lcl_y = decode_binary_float(gene=parents[i][1], lo=lo, hi=hi)
-        #
+        lcl_x = decode_binary_float(gene=parents[i][0], lo=lo_x, hi=hi_x)
+        lcl_y = decode_binary_float(gene=parents[i][1], lo=lo_y, hi=hi_y)
+
         # -- compute local score
         if kind == 'rastrigin':
-            scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
-        elif kind == 'sphere':
-            scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+            scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid_x, y0=mid_y)
+        elif kind == 'paraboloid':
+            scores[i] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid_x, y0=mid_y)
         elif kind == 'himmelblaus':
-            scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+            scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid_x, y0=mid_y)
         else:
-            scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+            scores[i] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid_x, y0=mid_y)
 
 
     # -- evolve generations
     for g in range(generations):
-        #print('\n\nGeneration {}'.format(g))
+        if tui:
+            status('Generation {}'.format(g))
         # store best score
         evolution_curve['Best_S'].values[g] = np.max(scores)
         if trace:
             traced[g] = parents.copy()
             traced_scores[g] = scores.copy()
 
-        # generate offspring using mating pool ids and parents
+        # generate offspring using parents
         for i in range(0, popsize - 1, 2):
             for j in range(dnasize):
                 # retrieve genes
@@ -232,18 +263,18 @@ def evolve_2d_function(lo, hi,
         for i in range(popsize):
             #
             # -- decode y and x
-            lcl_x = decode_binary_float(gene=offspring[i][0], lo=lo, hi=hi)
-            lcl_y = decode_binary_float(gene=offspring[i][1], lo=lo, hi=hi)
+            lcl_x = decode_binary_float(gene=offspring[i][0], lo=lo_x, hi=hi_x)
+            lcl_y = decode_binary_float(gene=offspring[i][1], lo=lo_y, hi=hi_y)
             #
             # -- compute local score
             if kind == 'rastrigin':
-                off_scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
-            elif kind == 'sphere':
-                off_scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                off_scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid_x, y0=mid_y)
+            elif kind == 'paraboloid':
+                off_scores[i] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid_x, y0=mid_y)
             elif kind == 'himmelblaus':
-                off_scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                off_scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid_x, y0=mid_y)
             else:
-                off_scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                off_scores[i] = paraboloid_2d(x=lcl_x, y=lcl_y, xx0=mid_x, y0=mid_y)
 
         # merge offspring with parents
         pool = np.append(parents, offspring, axis=0)
@@ -255,7 +286,7 @@ def evolve_2d_function(lo, hi,
             # sort pool
             lcl_df = pd.DataFrame({'S': pool_scores})
             lcl_df = lcl_df.sort_values(by='S', ascending=False)
-            # slice a popsize sample
+            # slice off a top-popsize sample
             pool_ids = np.array(lcl_df.index)[:popsize]
         else:  # RWS
             # -- compute pscores
@@ -271,26 +302,27 @@ def evolve_2d_function(lo, hi,
         for i in range(popsize):
             parents[i] = pool[pool_ids[i]]
             scores[i] = pool_scores[pool_ids[i]]
-        #print(g)
-        #print(scores)
+
     # return best solution
     last_best_score = np.max(scores)
     for i in range(popsize):
         if scores[i] == last_best_score:
             last_best_score_id = i
-    best_x = decode_binary_float(gene=parents[last_best_score_id][0], lo=lo, hi=hi)
-    best_y = decode_binary_float(gene=parents[last_best_score_id][1], lo=lo, hi=hi)
+    best_x = decode_binary_float(gene=parents[last_best_score_id][0], lo=lo_x, hi=hi_x)
+    best_y = decode_binary_float(gene=parents[last_best_score_id][1], lo=lo_y, hi=hi_y)
 
     # return data
     out_dct = {'Curve': evolution_curve, 'X': best_x, 'Y': best_y}
     if trace:
         traced_solutions = np.zeros(shape=(generations, dnasize, popsize))
         aux_dct = dict()
+        los = [lo_x, lo_y]
+        his = [hi_x, hi_y]
         for g in range(generations):
             # express solutions
             for i in range(dnasize):
                 for j in range(popsize):
-                    traced_solutions[g][i][j] = decode_binary_float(gene=traced[g][j][i], lo=lo, hi=hi)
+                    traced_solutions[g][i][j] = decode_binary_float(gene=traced[g][j][i], lo=los[i], hi=his[i])
             aux_dct['G'+ str(g) + '_x'] = traced_solutions[g][0]
             aux_dct['G' + str(g) + '_y'] = traced_solutions[g][1]
             aux_dct['G' + str(g) + '_S'] = traced_scores[g]

@@ -21,7 +21,7 @@ def griewank_2d(x, y, x0=50, y0=50, level=4):
     return level - (((np.square(x) + np.square(y)) / 4000) - (np.cos(x) * np.cos(y / np.sqrt(2))) + 1)
 
 
-def sphere_2d(x, y, x0=50, y0=50, level=100):
+def paraboloid_2d(x, y, x0=50, y0=50, level=100):
     """
     (upside down by level)
     :param x:
