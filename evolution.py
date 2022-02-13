@@ -151,6 +151,8 @@ def evolve_2d_function(lo, hi,
         from benchmark import sphere_2d
     elif kind == 'himmelblaus':
         from benchmark import himmelblaus
+    else:
+        from benchmark import sphere_2d
     # get 2d center
     mid = (hi - lo) / 2
 
@@ -191,6 +193,8 @@ def evolve_2d_function(lo, hi,
             scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
         elif kind == 'himmelblaus':
             scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+        else:
+            scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
 
 
     # -- evolve generations
@@ -237,7 +241,9 @@ def evolve_2d_function(lo, hi,
             elif kind == 'sphere':
                 off_scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
             elif kind == 'himmelblaus':
-                scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                off_scores[i] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+            else:
+                off_scores[i] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
 
         # merge offspring with parents
         pool = np.append(parents, offspring, axis=0)
@@ -265,7 +271,8 @@ def evolve_2d_function(lo, hi,
         for i in range(popsize):
             parents[i] = pool[pool_ids[i]]
             scores[i] = pool_scores[pool_ids[i]]
-
+        #print(g)
+        #print(scores)
     # return best solution
     last_best_score = np.max(scores)
     for i in range(popsize):

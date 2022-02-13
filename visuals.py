@@ -116,3 +116,5 @@ def himmelblaus_2d_plots():
     # Surface Plot
     ax.plot_surface(x_2d, y_2d, zs, cmap='jet')
     plt.show()
+
+#himmelblaus_2d_plots()

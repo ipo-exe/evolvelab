@@ -23,7 +23,7 @@ def evolution_2d_recipe():
 
     # load parameters
     folder = '/home/ipora/Documents/bin'
-    kind = 'himmelblaus'
+    kind = 'sphere' #'rastrigin' #'himmelblaus'
     wkpl = True
     label = kind
     # folder setup
@@ -31,10 +31,10 @@ def evolution_2d_recipe():
         if label != '':
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
-    generations = 10
+    generations = 20
     lo = 0
     hi = 10
-    popsize = 40
+    popsize = 2000
     genesize = 12
     mutrate = 0.5
     elite = True
@@ -49,12 +49,15 @@ def evolution_2d_recipe():
                              elitism=elite,
                              trace=trace,
                              kind=kind)
+
+    print(out['X'])
+    print(out['Y'])
+
     curve_df = out['Curve']
     fig = plt.figure(figsize=(7, 5), )  # Width, Height
     plt.plot(curve_df['Gen'], curve_df['Best_S'])
     plt.ylabel('Best Score')
     plt.xlabel('Generation')
-    plt.ylim(0, 105)
     expfile = folder + '/' + 'convergence.png'
     plt.savefig(expfile)
     plt.close(fig)
@@ -66,6 +69,8 @@ def evolution_2d_recipe():
             from benchmark import sphere_2d
         elif kind == 'himmelblaus':
             from benchmark import himmelblaus
+        else:
+            from benchmark import sphere_2d
         trace_df = out['Traced']
         for g in range(generations):
             # plot images
@@ -86,10 +91,12 @@ def evolution_2d_recipe():
                         zs[i][j] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
                     elif kind == 'himmelblaus':
                         zs[i][j] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                    else:
+                        zs[i][j] = sphere_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
             # plot
             fig = plt.figure(figsize=(6, 6), )  # Width, Height
             plt.title('Generation: {}'.format(g))
-            im = plt.imshow(zs, cmap='jet', origin='lower')
+            im = plt.imshow(zs, cmap='Spectral', origin='lower')
             plt.colorbar(im, shrink=0.4)
             ax_ticks = np.arange(start=0, stop=density, step=density / 10)
             ax_labels = np.arange(start=lo, stop=hi, step=hi / 10)
@@ -102,6 +109,7 @@ def evolution_2d_recipe():
                         y=trace_df['G{}_y'.format(g)] * density / (hi - lo),
                         marker='+', c='k', zorder=2)
             expfile = folder + '/' + 'G' + id_label(g) + '.png'
+            #plt.show()
             plt.savefig(expfile)
             plt.close(fig)
         status('plotting gif')

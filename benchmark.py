@@ -45,7 +45,7 @@ def rastrigin_2d(x, y, x0=50, y0=50, level=100):
                     (np.square(x) - 10 * np.cos(2 * np.pi * x))
                     + (np.square(y) - 10 * np.cos(2 * np.pi * y)))
 
-def himmelblaus(x, y, x0=50, y0=50, level=100):
+def himmelblaus(x, y, x0=50, y0=50, level=1000):
     # set center
     x = x - x0
     y = y - y0
