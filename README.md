@@ -40,10 +40,25 @@ end
 Equation:
 
 ```markdown
-level - (np.square(x - x0) + np.square(y - y0))
+level - (square(x - x0) + square(y - y0))
 ```
 where `level`, `x0` and `y0` are pre-set parameters
 
 Example of `level=100`, `x0=5`, `y0=5`:
 
 ![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/parab.png "parab")
+
+#### the `rastrigin 2d` function
+
+Equation:
+
+```markdown
+level - (20 + (square(x - x0) - 10 * cos(2 * pi * (x - x0))) + (square(y - y0) - 10 * cos(2 * pi * (y - y0))))
+```
+where `level`, `x0` and `y0` are pre-set parameters
+
+Example of `level=100`, `x0=5`, `y0=5`:
+
+![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/rastr_2d.png "rastr_2d")
+
+
