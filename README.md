@@ -59,6 +59,17 @@ where `level`, `x0` and `y0` are pre-set parameters
 
 Example of `level=100`, `x0=5`, `y0=5`:
 
-![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/rastr_2d.png "rastr_2d")
+![rastr](https://github.com/ipo-exe/evolvelab/blob/main/docs/rastr_2d.png "rastr_2d")
 
+#### the `himmelblaus` function
 
+Equation:
+
+```markdown
+level - (square(square(x - x0) + (y - y0) - 11) + square((x - x0) + square(y - y0) - 7))
+```
+where `level`, `x0` and `y0` are pre-set parameters
+
+Example of `level=100`, `x0=5`, `y0=5`:
+
+![himm](https://github.com/ipo-exe/evolvelab/blob/main/docs/himm.png "himm")
