@@ -70,6 +70,6 @@ level - (square(square(x - x0) + (y - y0) - 11) + square((x - x0) + square(y - y
 ```
 where `level`, `x0` and `y0` are pre-set parameters
 
-Example of `level=100`, `x0=5`, `y0=5`:
+Example of `level=1000`, `x0=5`, `y0=5`:
 
 ![himm](https://github.com/ipo-exe/evolvelab/blob/main/docs/himm.png "himm")

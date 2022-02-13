@@ -7,6 +7,7 @@ def evolution_2d_recipe():
     from evolution import evolve_2d_function
     from backend import create_rundir, status
     import matplotlib.pyplot as plt
+    import matplotlib as mpl
     import numpy as np
     import imageio
     import os
@@ -31,16 +32,16 @@ def evolution_2d_recipe():
         if label != '':
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
-    generations = 10
-    lo_x = 3
-    hi_x = 7
+    generations = 15
+    lo_x = 0
+    hi_x = 10
     lo_y = 0
     hi_y = 10
     mid = 5.0
-    popsize = 500
-    genesize = 12
+    popsize = 200
+    genesize = 10
     mutrate = 0.5
-    elite = False
+    elite = True
     trace = True
 
     out = evolve_2d_function(lo_x=lo_x,
@@ -98,12 +99,17 @@ def evolution_2d_recipe():
                     zs[i][j] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
                 else:
                     zs[i][j] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+        zmin = np.min(zs)
+        zmax = np.max(zs)
         for g in range(generations):
             # plot images
             status('plot {}'.format(g))
             # plot
-            fig = plt.figure(figsize=(6, 6), )  # Width, Height
-            plt.title('Generation: {}'.format(g))
+            fig = plt.figure(figsize=(10, 5), )  # Width, Height
+            gs = mpl.gridspec.GridSpec(2, 3, wspace=0.3, hspace=0.45, left=0.05, bottom=0.1, top=0.9, right=0.95)
+            # plot 1
+            ax = fig.add_subplot(gs[:2, :2])
+            fig.suptitle('Generation: {}'.format(g))
             im = plt.imshow(zs, cmap='Spectral', origin='lower')
             plt.colorbar(im, shrink=0.4)
             ax_ticks = np.arange(start=0, stop=density, step=density / 10)
@@ -112,17 +118,23 @@ def evolution_2d_recipe():
             plt.yticks(ticks=ax_ticks, labels=ax_labels)
             plt.ylim(0, len(ys))
             plt.xlim(0, len(xs))
-            #plt.plot(mid * density / (hi - lo), mid * density / (hi - lo), 'o', color='magenta', zorder=1)
             plt.scatter(x=trace_df['G{}_x'.format(g)] * density / (hi - lo),
                         y=trace_df['G{}_y'.format(g)] * density / (hi - lo),
                         marker='+', c='k', zorder=2)
+            # plot 2
+            ax = fig.add_subplot(gs[:2, 2])
+            lcl_ax = np.random.randint(low=-100, high=100, size=popsize)
+            plt.scatter(x=lcl_ax, y=trace_df['G{}_S'.format(g)], color='black', alpha=0.3, edgecolors='none')
+            plt.xlim(-100, 100)
+            plt.ylim(zmin, zmax * 1.1)
+            plt.xticks([])
+            plt.ylabel('Score')
             expfile = folder + '/' + 'G' + id_label(g) + '.png'
-            #plt.show()
             plt.savefig(expfile)
             plt.close(fig)
         status('plotting gif')
         png_dir = folder
-        gifname = png_dir + '/spoiler.gif'
+        gifname = png_dir + '/animation.gif'
         images = []
         for file_name in sorted(os.listdir(png_dir)):
             if file_name.endswith('.png') and file_name.startswith('G'):
