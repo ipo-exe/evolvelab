@@ -38,7 +38,7 @@ def evolution_2d_recipe():
     lo_y = 0
     hi_y = 10
     mid = 5.0
-    popsize = 200
+    popsize = 300
     genesize = 10
     mutrate = 0.5
     elite = True
@@ -118,16 +118,18 @@ def evolution_2d_recipe():
             plt.yticks(ticks=ax_ticks, labels=ax_labels)
             plt.ylim(0, len(ys))
             plt.xlim(0, len(xs))
+            plt.xlabel('x')
+            plt.ylabel('y')
             plt.scatter(x=trace_df['G{}_x'.format(g)] * density / (hi - lo),
                         y=trace_df['G{}_y'.format(g)] * density / (hi - lo),
                         marker='+', c='k', zorder=2)
             # plot 2
             ax = fig.add_subplot(gs[:2, 2])
-            lcl_ax = np.random.randint(low=-100, high=100, size=popsize)
-            plt.scatter(x=lcl_ax, y=trace_df['G{}_S'.format(g)], color='black', alpha=0.3, edgecolors='none')
-            plt.xlim(-100, 100)
+            lcl_ax = np.linspace(lo_x, hi_x, popsize) #np.random.randint(low=-100, high=100, size=popsize)
+            plt.scatter(x=trace_df['G{}_x'.format(g)], y=trace_df['G{}_S'.format(g)], color='black', alpha=0.3, edgecolors='none')
+            plt.xlim(lo_x, hi_x)
             plt.ylim(zmin, zmax * 1.1)
-            plt.xticks([])
+            plt.xlabel('x')
             plt.ylabel('Score')
             expfile = folder + '/' + 'G' + id_label(g) + '.png'
             plt.savefig(expfile)
