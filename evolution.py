@@ -195,6 +195,9 @@ def evolve_2d_function(lo_x, hi_x, lo_y, hi_y, mid_x, mid_y,
     # declare curve dataframe
     evolution_curve = pd.DataFrame({'Gen': np.arange(0, generations)})
     evolution_curve['Best_S'] = 0.0
+    evolution_curve['p95'] = 0.0
+    evolution_curve['p50'] = 0.0
+    evolution_curve['p05'] = 0.0
 
     # generate initial population with popsize
     dnasize = 2
@@ -233,6 +236,9 @@ def evolve_2d_function(lo_x, hi_x, lo_y, hi_y, mid_x, mid_y,
             status('Generation {}'.format(g))
         # store best score
         evolution_curve['Best_S'].values[g] = np.max(scores)
+        evolution_curve['p95'].values[g] = np.percentile(scores, 95)
+        evolution_curve['p50'].values[g] = np.percentile(scores, 50)
+        evolution_curve['p05'].values[g] = np.percentile(scores, 5)
         if trace:
             traced[g] = parents.copy()
             traced_scores[g] = scores.copy()

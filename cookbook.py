@@ -6,25 +6,17 @@ Recipes or proto-tools
 def evolution_2d_recipe():
     from evolution import evolve_2d_function
     from backend import create_rundir, status
+    from visuals import convergence, pannel_generation
     import matplotlib.pyplot as plt
     import matplotlib as mpl
     import numpy as np
     import imageio
     import os
 
-    def id_label(id):
-        if id < 10:
-            return '000' + str(id)
-        elif id >= 10 and id < 100:
-            return '00' + str(id)
-        elif id >= 100 and id < 1000:
-            return '0' + str(id)
-        elif id >= 1000 and id < 10000:
-            return str(id)
-
     # load parameters
     folder = '/home/ipora/Documents/bin'
-    kind = 'himmelblaus' #'paraboloid' #'rastrigin' #'himmelblaus'
+    kinds = ['paraboloid', 'rastrigin', 'himmelblaus']
+    kind = kinds[0]
     wkpl = True
     label = kind
     # folder setup
@@ -32,13 +24,13 @@ def evolution_2d_recipe():
         if label != '':
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
-    generations = 15
+    generations = 20
     lo_x = 0
-    hi_x = 10
+    hi_x = 4
     lo_y = 0
     hi_y = 10
     mid = 5.0
-    popsize = 300
+    popsize = 100
     genesize = 10
     mutrate = 0.5
     elite = True
@@ -60,13 +52,7 @@ def evolution_2d_recipe():
                              tui=True)
 
     curve_df = out['Curve']
-    fig = plt.figure(figsize=(7, 5), )  # Width, Height
-    plt.plot(curve_df['Gen'], curve_df['Best_S'])
-    plt.ylabel('Best Score')
-    plt.xlabel('Generation')
-    expfile = folder + '/' + 'convergence.png'
-    plt.savefig(expfile)
-    plt.close(fig)
+    convergence(curve_df=curve_df, folder=folder, show=False)
 
     if trace:
         lo = 0
@@ -99,41 +85,12 @@ def evolution_2d_recipe():
                     zs[i][j] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
                 else:
                     zs[i][j] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
-        zmin = np.min(zs)
-        zmax = np.max(zs)
+
         for g in range(generations):
             # plot images
             status('plot {}'.format(g))
             # plot
-            fig = plt.figure(figsize=(10, 5), )  # Width, Height
-            gs = mpl.gridspec.GridSpec(2, 3, wspace=0.3, hspace=0.45, left=0.05, bottom=0.1, top=0.9, right=0.95)
-            # plot 1
-            ax = fig.add_subplot(gs[:2, :2])
-            fig.suptitle('Generation: {}'.format(g))
-            im = plt.imshow(zs, cmap='Spectral', origin='lower')
-            plt.colorbar(im, shrink=0.4)
-            ax_ticks = np.arange(start=0, stop=density, step=density / 10)
-            ax_labels = np.arange(start=lo, stop=hi, step=hi / 10)
-            plt.xticks(ticks=ax_ticks, labels=ax_labels)
-            plt.yticks(ticks=ax_ticks, labels=ax_labels)
-            plt.ylim(0, len(ys))
-            plt.xlim(0, len(xs))
-            plt.xlabel('x')
-            plt.ylabel('y')
-            plt.scatter(x=trace_df['G{}_x'.format(g)] * density / (hi - lo),
-                        y=trace_df['G{}_y'.format(g)] * density / (hi - lo),
-                        marker='+', c='k', zorder=2)
-            # plot 2
-            ax = fig.add_subplot(gs[:2, 2])
-            lcl_ax = np.linspace(lo_x, hi_x, popsize) #np.random.randint(low=-100, high=100, size=popsize)
-            plt.scatter(x=trace_df['G{}_x'.format(g)], y=trace_df['G{}_S'.format(g)], color='black', alpha=0.3, edgecolors='none')
-            plt.xlim(lo_x, hi_x)
-            plt.ylim(zmin, zmax * 1.1)
-            plt.xlabel('x')
-            plt.ylabel('Score')
-            expfile = folder + '/' + 'G' + id_label(g) + '.png'
-            plt.savefig(expfile)
-            plt.close(fig)
+            pannel_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize, folder=folder, show=False)
         status('plotting gif')
         png_dir = folder
         gifname = png_dir + '/animation.gif'
