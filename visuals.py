@@ -8,7 +8,7 @@ def paraboloid_2d_plots(folder='C:/bin', filename='convergence', suff='', show=T
     density = 500
     lo = 0
     hi = 10
-    mid = (hi - lo) / 2
+    mid = (hi + lo) / 2
     xs = np.linspace(lo, hi, density)
     ys = np.linspace(lo, hi, density)
     zs = np.zeros(shape=(len(ys), len(xs)))
@@ -22,7 +22,7 @@ def paraboloid_2d_plots(folder='C:/bin', filename='convergence', suff='', show=T
     ax = fig.add_subplot(gs[0, 0])
     plt.imshow(zs, cmap='Spectral', origin='lower')
     ax_ticks = np.arange(start=0, stop=density, step=density / 10)
-    ax_labels = np.arange(start=lo, stop=hi, step=hi / 10)
+    ax_labels = np.arange(start=lo, stop=hi, step=(hi - lo) / 10)
     plt.xticks(ticks=ax_ticks, labels=ax_labels)
     plt.yticks(ticks=ax_ticks, labels=ax_labels)
     plt.title('a. upper view')
@@ -50,7 +50,7 @@ def rastrigin_2d_plots(folder='C:/bin', filename='convergence', suff='', show=Tr
     density = 500
     lo = 0
     hi = 10
-    mid = (hi - lo) / 2
+    mid = (hi + lo) / 2
     xs = np.linspace(lo, hi, density)
     ys = np.linspace(lo, hi, density)
     zs = np.zeros(shape=(len(ys), len(xs)))
@@ -64,7 +64,7 @@ def rastrigin_2d_plots(folder='C:/bin', filename='convergence', suff='', show=Tr
     ax = fig.add_subplot(gs[0, 0])
     plt.imshow(zs, cmap='Spectral', origin='lower')
     ax_ticks = np.arange(start=0, stop=density, step=density / 10)
-    ax_labels = np.arange(start=lo, stop=hi, step=hi / 10)
+    ax_labels = np.arange(start=lo, stop=hi, step=(hi - lo) / 10)
     plt.xticks(ticks=ax_ticks, labels=ax_labels)
     plt.yticks(ticks=ax_ticks, labels=ax_labels)
     plt.title('a. upper view')
@@ -92,7 +92,7 @@ def himmelblaus_2d_plots(folder='C:/bin', filename='convergence', suff='', show=
     density = 500
     lo = 0
     hi = 10
-    mid = (hi - lo) / 2
+    mid = (hi + lo) / 2
     xs = np.linspace(lo, hi, density)
     ys = np.linspace(lo, hi, density)
     zs = np.zeros(shape=(len(ys), len(xs)))
@@ -106,7 +106,7 @@ def himmelblaus_2d_plots(folder='C:/bin', filename='convergence', suff='', show=
     ax = fig.add_subplot(gs[0, 0])
     plt.imshow(zs, cmap='Spectral', origin='lower')
     ax_ticks = np.arange(start=0, stop=density, step=density/10)
-    ax_labels = np.arange(start=lo, stop=hi, step=hi/10)
+    ax_labels = np.arange(start=lo, stop=hi, step=(hi - lo)/10)
     plt.xticks(ticks=ax_ticks, labels=ax_labels)
     plt.yticks(ticks=ax_ticks, labels=ax_labels)
     plt.title('a. upper view')
