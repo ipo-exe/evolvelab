@@ -16,7 +16,7 @@ def evolution_2d_recipe():
     # load parameters
     folder = '/home/ipora/Documents/bin'
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus']
-    kind = kinds[0]
+    kind = kinds[1]
     wkpl = True
     label = kind
     # folder setup
