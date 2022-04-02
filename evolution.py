@@ -456,7 +456,11 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
         scores = np.concatenate((parents_scores, offspring_scores))  # merge scores
         scores_ids = np.arange(len(scores)) # create ids
         scores_df = pd.DataFrame({'Id': scores_ids, 'Score': scores})
-        scores_df.sort_values(by='Score', ascending=False, inplace=True)  # sort scores and ids
+        scores_df['New'] = 0.0
+        scores_df['New'] = scores_df['Score'].values + (30 * (scores_df['Score'].values > 80))
+        # todo here
+        scores_df.sort_values(by='New', ascending=False, inplace=True)  # sort scores and ids
+
         for i in range(popsize):
             # decide key
             lcl_score_id = scores_df['Id'].values[i]
