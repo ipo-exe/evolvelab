@@ -129,8 +129,8 @@ def himmelblaus_2d_plots(folder='C:/bin', filename='convergence', suff='', show=
         return filepath
 
 
-def pannel_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
-                      folder='C:/bin', suff='', show=True):
+def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
+                         x_lbl='X', y_lbl='Y', folder='C:/bin', suff='', show=True):
 
     def id_label(id):
         if id < 10:
@@ -153,21 +153,23 @@ def pannel_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
     im = plt.imshow(zs, cmap='Spectral', origin='lower')
     plt.colorbar(im, shrink=0.4)
     ax_ticks = np.arange(start=0, stop=len(xs), step=len(xs) / 10)
-    ax_labels = np.arange(start=lo, stop=hi, step=hi / 10)
+    ax_labels = np.arange(start=lo, stop=hi, step=(hi - lo) / 10)
     plt.xticks(ticks=ax_ticks, labels=ax_labels)
     plt.yticks(ticks=ax_ticks, labels=ax_labels)
     plt.ylim(0, len(ys))
     plt.xlim(0, len(xs))
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.scatter(x=trace_df['G{}_x'.format(g)] * len(xs) / (hi - lo),
-                y=trace_df['G{}_y'.format(g)] * len(xs) / (hi - lo),
+    aux_a = (len(zs[0]) / (hi - lo))
+    aux_b = -aux_a * lo
+    plt.scatter(x=(aux_a * trace_df[x_lbl]) + aux_b,
+                y=(aux_a * trace_df[y_lbl]) + aux_b,
                 marker='+', c='k', zorder=2)
     # plot 2
     ax = fig.add_subplot(gs[:2, 2])
     lcl_ax = np.linspace(lo_x, hi_x, popsize)  # np.random.randint(low=-100, high=100, size=popsize)
-    plt.scatter(x=trace_df['G{}_x'.format(g)],
-                y=trace_df['G{}_S'.format(g)],
+    plt.scatter(x=trace_df[x_lbl],
+                y=trace_df['Score'],
                 color='black',
                 alpha=0.3,
                 edgecolors='none')

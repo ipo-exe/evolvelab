@@ -57,8 +57,9 @@ def rastrigin(xs, xc=50, level=100):
     n = len(xs)
     # set center:
     x = xs - xc
-    aux = level - (10 * n)
+    aux = (10 * n)
     for i in range(n):
         aux = aux + (np.square(x[i]) - 10 * np.cos(2 * np.pi * x[i]))
+    return level - aux
 
 
