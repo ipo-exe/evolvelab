@@ -31,7 +31,7 @@ def evolution_2d_recipe():
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 20
+    popsize = 200
     trace = True
     ranges_df = pd.DataFrame({'Lo': [lo_x, lo_y],
                               'Hi': [hi_x, hi_y],
@@ -40,7 +40,7 @@ def evolution_2d_recipe():
                  generations=generations,
                  popsize=popsize,
                  trace=trace,
-                 mutt=5,
+                 mutt=50,
                  coarse=True)
 
     curve_df = out['Curve']

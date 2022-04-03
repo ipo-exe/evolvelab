@@ -457,7 +457,7 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
         scores_ids = np.arange(len(scores)) # create ids
         scores_df = pd.DataFrame({'Id': scores_ids, 'Score': scores})
         scores_df['New'] = 0.0
-        scores_df['New'] = scores_df['Score'].values + (30 * (scores_df['Score'].values > 80))
+        scores_df['New'] = (scores_df['Score'].values * (scores_df['Score'].values < 90)) + (100 * (scores_df['Score'].values >= 90))
         # todo here
         scores_df.sort_values(by='New', ascending=False, inplace=True)  # sort scores and ids
 
