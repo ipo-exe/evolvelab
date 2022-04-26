@@ -174,7 +174,7 @@ def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
                 alpha=0.3,
                 edgecolors='none')
     plt.xlim(np.min(xs), np.max(xs))
-    plt.ylim(zmin, zmax * 1.1)
+    plt.ylim(0, zmax * 1.1)
     plt.xlabel('x')
     plt.ylabel('Score')
     filename = 'G' + id_label(g) + '.png'

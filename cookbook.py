@@ -18,7 +18,7 @@ def evolution_2d_recipe():
     folder = '/home/ipora/Documents/bin'
     folder = 'C:/bin'
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus']
-    kind = kinds[1]
+    kind = kinds[2]
     wkpl = True
     label = kind
     # folder setup
@@ -32,7 +32,8 @@ def evolution_2d_recipe():
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 200
+    popsize = 300
+    mutt = 60
     trace = True
     ranges_df = pd.DataFrame({'Lo': [lo_x, lo_y],
                               'Hi': [hi_x, hi_y],
@@ -41,7 +42,7 @@ def evolution_2d_recipe():
                  generations=generations,
                  popsize=popsize,
                  trace=trace,
-                 mutt=50,
+                 mutt=mutt,
                  coarse=True)
 
     curve_df = out['Curve']
@@ -75,7 +76,7 @@ def evolution_2d_recipe():
                 elif kind == 'paraboloid':
                     zs[i][j] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
                 elif kind == 'himmelblaus':
-                    zs[i][j] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
+                    zs[i][j] = himmelblaus(x=lcl_x, y=lcl_y, x0=mid, y0=mid, level=100)
                 else:
                     zs[i][j] = paraboloid_2d(x=lcl_x, y=lcl_y, x0=mid, y0=mid)
 

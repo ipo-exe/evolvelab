@@ -338,7 +338,8 @@ def evolve_2d_function(lo_x, hi_x, lo_y, hi_y, mid_x, mid_y,
 
 
 def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True):
-    from benchmark import rastrigin_2d, paraboloid_2d
+
+    from benchmark import rastrigin_2d, paraboloid_2d, himmelblaus
 
     def express_gene(x, y_lo, y_hi, x_hi=255):
         """
@@ -399,6 +400,8 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
 
     # get initial population:
     parents = np.random.randint(low=0, high=_high, size=(popsize, genesize), dtype=_dtype)
+    parents = int(_high / 2) + np.zeros(shape=(popsize, genesize), dtype=_dtype)
+
     # generations loop:
     for g in range(0, generations):
         status('generation {}'.format(g))
@@ -447,11 +450,11 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
             #
             #
             # compute objective function
-            population[lcl_key]['Scores'][lcl_id] = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            ## population[lcl_key]['Scores'][lcl_id] = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            population[lcl_key]['Scores'][lcl_id] = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
             #
             #
             #
-
         # retrieve best next parents
         scores = np.concatenate((parents_scores, offspring_scores))  # merge scores
         scores_ids = np.arange(len(scores)) # create ids
@@ -514,9 +517,6 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
                     trace_df[genes_df['Labels'].values[j]].values[counter] = lcl_solution[j]
                 counter = counter + 1
         out_dct['Traced'] = trace_df
-
-
-
     return out_dct
 
 '''
