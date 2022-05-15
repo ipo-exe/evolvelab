@@ -215,11 +215,9 @@ def evolve_2d_function(lo_x, hi_x, lo_y, hi_y, mid_x, mid_y,
 
     # -- evaluate each solution
     for i in range(popsize):
-
         # -- decode y and x
         lcl_x = decode_binary_float(gene=parents[i][0], lo=lo_x, hi=hi_x)
         lcl_y = decode_binary_float(gene=parents[i][1], lo=lo_y, hi=hi_y)
-
         # -- compute local score
         if kind == 'rastrigin':
             scores[i] = rastrigin_2d(x=lcl_x, y=lcl_y, x0=mid_x, y0=mid_y)
@@ -337,7 +335,7 @@ def evolve_2d_function(lo_x, hi_x, lo_y, hi_y, mid_x, mid_y,
     return out_dct
 
 
-def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True):
+def evolve(df_genes, generations=10, popsize=10, mutt=1, coarse=True, trace=True):
 
     from benchmark import rastrigin_2d, paraboloid_2d, himmelblaus
 
@@ -373,7 +371,7 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
         _high = 65535
 
     # get gene size:
-    genesize = len(genes_df['Hi'])
+    genesize = len(df_genes['Hi'])
 
     # set overall random state
     seed = int(str(datetime.now())[-6:])
@@ -399,8 +397,8 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
         status(msg='traced scores array size: {} KB'.format(getsizeof(traced_offpring_scores) / 1000), process=False)
 
     # get initial population:
-    parents = np.random.randint(low=0, high=_high, size=(popsize, genesize), dtype=_dtype)
-    parents = int(_high / 2) + np.zeros(shape=(popsize, genesize), dtype=_dtype)
+    ### parents = np.random.randint(low=0, high=_high, size=(popsize, genesize), dtype=_dtype)
+    parents = int(_high / 10) + np.zeros(shape=(popsize, genesize), dtype=_dtype)
 
     # generations loop:
     for g in range(0, generations):
@@ -421,20 +419,23 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
             else:
                 _first_id = i
                 _secnd_id = 0
-            # reproduce genes by gene average
+            # reproduce genes by gene averag
             lcl_gene_offs = apply_gene_average(gene_a=parents[_first_id], gene_b=parents[_secnd_id], origin_type=_dtype)
             offspring[i] = lcl_gene_offs.astype(_dtype)
 
         # apply variation operator:
         mutation_mask = np.random.normal(loc=0, scale=mutt, size=np.shape(offspring)).astype(dtype=_dtype)
-        offspring = offspring + mutation_mask
+        offspring = offspring + mutation_mask # offsprint +- a normal change
 
-        # evaluate full population
+        # evaluate full population at once
         parents_scores = np.zeros(shape=popsize, dtype='float')
         offspring_scores = np.zeros(shape=popsize, dtype='float')
-        # declare a map (dictionary) to assess the full population
-        population = {'Parents': {'Genes': parents, 'Scores': parents_scores},
-                      'Offspring': {'Genes': offspring, 'Scores': offspring_scores}}
+        # declare a map (dictionary) to assess the full population without duplicate variables in memory
+        population = {'Parents': {'Genes': parents,
+                                  'Scores': parents_scores},
+                      'Offspring': {'Genes': offspring,
+                                    'Scores': offspring_scores}}
+        # evaluation loop
         for i in range(2 * popsize):
             # decide key
             lcl_key = 'Parents'
@@ -445,28 +446,40 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
             # express parent gene
             lcl_gene = express_gene(x=population[lcl_key]['Genes'][lcl_id],
                                     x_hi=_high,
-                                    y_lo=genes_df['Lo'].values,
-                                    y_hi=genes_df['Hi'].values)
+                                    y_lo=df_genes['Lo'].values,
+                                    y_hi=df_genes['Hi'].values)
             #
             #
             # compute objective function
-            ## population[lcl_key]['Scores'][lcl_id] = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
-            population[lcl_key]['Scores'][lcl_id] = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            population[lcl_key]['Scores'][lcl_id] = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            ###population[lcl_key]['Scores'][lcl_id] = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
             #
             #
             #
+
+        # trace parents and offspring at this point
+        if trace:
+            traced_parents[g] = parents.copy()
+            traced_parents_scores[g] = parents_scores.copy()
+            traced_offpring[g] = offspring.copy()
+            traced_offpring_scores[g] = offspring_scores.copy()
+
         # retrieve best next parents
         scores = np.concatenate((parents_scores, offspring_scores))  # merge scores
-        scores_ids = np.arange(len(scores)) # create ids
-        scores_df = pd.DataFrame({'Id': scores_ids, 'Score': scores})
+        scores_df = pd.DataFrame({'Id': np.arange(len(scores)), 'Score': scores})
+
+        # todo here -- method to explore only -- implement optional feature
         scores_df['New'] = 0.0
-        scores_df['New'] = (scores_df['Score'].values * (scores_df['Score'].values < 90)) + (100 * (scores_df['Score'].values >= 90))
-        # todo here
+        threshold = 90
+        scores_df['New'] = (scores_df['Score'].values * (scores_df['Score'].values < threshold)) + (100 * (scores_df['Score'].values >= threshold))
+        #
+        #
         scores_df.sort_values(by='New', ascending=False, inplace=True)  # sort scores and ids
 
         for i in range(popsize):
-            # decide key
+            # # use id to retrieve from population
             lcl_score_id = scores_df['Id'].values[i]
+            # smart trick to access population
             if lcl_score_id >= popsize:
                 lcl_key = 'Offspring'
                 lcl_id = lcl_score_id - popsize
@@ -483,67 +496,44 @@ def evolve(genes_df, generations=10, popsize=10, mutt=1, coarse=True, trace=True
         evolution_curve['p50'].values[g] = np.percentile(parents_scores, 50)
         evolution_curve['p05'].values[g] = np.percentile(parents_scores, 5)
 
-        # trace
-        if trace:
-            traced_parents[g] = parents.copy()
-            traced_parents_scores[g] = parents_scores.copy()
-            traced_offpring[g] = offspring.copy()
-            traced_offpring_scores[g] = offspring_scores.copy()
+
 
     last_best_solution = express_gene(x=parents[0],
                                       x_hi=_high,
-                                      y_lo=genes_df['Lo'].values,
-                                      y_hi=genes_df['Hi'].values)
-    out_dct = {'Curve': evolution_curve}
-    for i in range(len(genes_df['Labels'].values)):
-        out_dct['Best_{}'.format(genes_df['Labels'].values[i])] = last_best_solution[i]
-
+                                      y_lo=df_genes['Lo'].values,
+                                      y_hi=df_genes['Hi'].values)
+    # define output dict
+    dct_output = {'Curve': evolution_curve}
+    # append keys
+    for i in range(len(df_genes['Labels'].values)):
+        dct_output['Best_{}'.format(df_genes['Labels'].values[i])] = last_best_solution[i]
+    # append more
     if trace:
+        # array
         aux_generations = np.zeros(generations * popsize, dtype='uint16')
-        trace_df = pd.DataFrame({'Gen': aux_generations})
-        trace_df['Score'] = 0.0
-        for k in genes_df['Labels'].values:
-            trace_df[k] = 0.0
+        # define dataframe. set Gen field
+        df_trace = pd.DataFrame({'Gen': aux_generations})
+        # set scores field
+        df_trace['Score'] = 0.0
+        # append more fields
+        for k in df_genes['Labels'].values:
+            df_trace[k] = 0.0
         counter = 0
         for g in range(generations):
             for i in range(popsize):
+                # append generation
+                df_trace['Gen'].values[counter] = g
+                # append score
+                df_trace['Score'].values[counter] = traced_parents_scores[g][i]
+                # express local solution
                 lcl_solution = express_gene(x=traced_parents[g][i],
                                             x_hi=_high,
-                                            y_lo=genes_df['Lo'].values,
-                                            y_hi=genes_df['Hi'].values)
-                trace_df['Gen'].values[counter] = g
-                trace_df['Score'].values[counter] = traced_parents_scores[g][i]
-                for j in range(len(genes_df['Labels'].values)):
-                    trace_df[genes_df['Labels'].values[j]].values[counter] = lcl_solution[j]
+                                            y_lo=df_genes['Lo'].values,
+                                            y_hi=df_genes['Hi'].values)
+                # append solution in fields
+                for j in range(len(df_genes['Labels'].values)):
+                    df_trace[df_genes['Labels'].values[j]].values[counter] = lcl_solution[j]
                 counter = counter + 1
-        out_dct['Traced'] = trace_df
-    return out_dct
-
-'''
-ranges_df = pd.DataFrame({'Lo': [-20, -20],
-                          'Hi': [2, 2],
-                          'Labels': ['X', 'Y']})
-
-e = evolve(genes_df=ranges_df,
-           popsize=5,
-           generations=3,
-           coarse=False,
-           trace=True,
-           mutt=1)
-print(e)
-
-import matplotlib.pyplot as plt
-
-curve = e['Curve']
-
-plt.plot(curve['Gen'], curve['Best_S'])
-plt.plot(curve['Gen'], curve['p95'])
-plt.plot(curve['Gen'], curve['p50'])
-plt.plot(curve['Gen'], curve['p05'])
-plt.ylim(0, 101)
-plt.show()
-
-
-'''
-
+        dct_output['Traced'] = df_trace
+    return dct_output
 

@@ -3,22 +3,21 @@ Recipes or proto-tools
 
 """
 
+
 def evolution_2d_recipe():
     from evolution import evolve_2d_function, evolve
     from backend import create_rundir, status
     from visuals import convergence, pannel_2d_generation
+    from out import export_gif
     import matplotlib.pyplot as plt
     import matplotlib as mpl
     import numpy as np
     import pandas as pd
-    import imageio
-    import os
-
     # load parameters
     folder = '/home/ipora/Documents/bin'
     folder = 'C:/bin'
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus']
-    kind = kinds[2]
+    kind = kinds[1]
     wkpl = True
     label = kind
     # folder setup
@@ -32,18 +31,24 @@ def evolution_2d_recipe():
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 300
-    mutt = 60
+    popsize = 200
+    mutt = 30
     trace = True
     ranges_df = pd.DataFrame({'Lo': [lo_x, lo_y],
                               'Hi': [hi_x, hi_y],
                               'Labels': ['X', 'Y']})
-    out = evolve(genes_df=ranges_df,
+    out = evolve(df_genes=ranges_df,
                  generations=generations,
                  popsize=popsize,
                  trace=trace,
                  mutt=mutt,
                  coarse=True)
+    # todo
+    """
+    O score das gerações está certo, mas as soluções nao estao - defasadas
+    
+    """
+
 
     curve_df = out['Curve']
     convergence(curve_df=curve_df, folder=folder, show=False)
@@ -87,14 +92,7 @@ def evolution_2d_recipe():
             # plot
             pannel_2d_generation(lcl_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize, folder=folder, show=False)
         status('plotting gif')
-        png_dir = folder
-        gifname = png_dir + '/animation.gif'
-        images = []
-        for file_name in sorted(os.listdir(png_dir)):
-            if file_name.endswith('.png') and file_name.startswith('G'):
-                file_path = os.path.join(png_dir, file_name)
-                images.append(imageio.imread(file_path))
-        imageio.mimsave(gifname, images)
+        export_gif(dir_images=folder, nm_gif='animation', kind='png', suf='G')
 
 
 evolution_2d_recipe()

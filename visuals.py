@@ -130,7 +130,7 @@ def himmelblaus_2d_plots(folder='C:/bin', filename='convergence', suff='', show=
 
 
 def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
-                         x_lbl='X', y_lbl='Y', folder='C:/bin', suff='', show=True):
+                         x_lbl='X', y_lbl='Y', folder='C:/bin', suff='', show=True, dark=True):
 
     def id_label(id):
         if id < 10:
@@ -142,7 +142,18 @@ def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
         elif id >= 1000 and id < 10000:
             return str(id)
 
-    zmin = np.min(zs)
+    marker_color = 'k'
+    z_cmap = 'Spectral'
+    if dark:
+        plt.style.use('dark_background')
+        marker_color = 'white'
+        z_cmap = 'inferno'
+
+    if trace_df['Score'].min() > 0:
+        zmin = 0
+    else:
+        zmin = trace_df['Score'].min()
+
     zmax = np.max(zs)
 
     fig = plt.figure(figsize=(10, 5), )  # Width, Height
@@ -150,7 +161,10 @@ def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
     # plot 1
     ax = fig.add_subplot(gs[:2, :2])
     fig.suptitle('Generation: {}'.format(g))
-    im = plt.imshow(zs, cmap='Spectral', origin='lower')
+    im = plt.imshow(zs,
+                    cmap=z_cmap,
+                    origin='lower',
+                    vmin=np.percentile(zs, 5))
     plt.colorbar(im, shrink=0.4)
     ax_ticks = np.arange(start=0, stop=len(xs), step=len(xs) / 10)
     ax_labels = np.arange(start=lo, stop=hi, step=(hi - lo) / 10)
@@ -164,17 +178,16 @@ def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
     aux_b = -aux_a * lo
     plt.scatter(x=(aux_a * trace_df[x_lbl]) + aux_b,
                 y=(aux_a * trace_df[y_lbl]) + aux_b,
-                marker='+', c='k', zorder=2)
+                marker='+', c='darkgrey', zorder=2)
     # plot 2
     ax = fig.add_subplot(gs[:2, 2])
-    lcl_ax = np.linspace(lo_x, hi_x, popsize)  # np.random.randint(low=-100, high=100, size=popsize)
     plt.scatter(x=trace_df[x_lbl],
                 y=trace_df['Score'],
-                color='black',
+                color=marker_color,
                 alpha=0.3,
                 edgecolors='none')
     plt.xlim(np.min(xs), np.max(xs))
-    plt.ylim(0, zmax * 1.1)
+    plt.ylim(zmin, zmax * 1.1)
     plt.xlabel('x')
     plt.ylabel('Score')
     filename = 'G' + id_label(g) + '.png'

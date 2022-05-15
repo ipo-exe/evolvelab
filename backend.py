@@ -1,5 +1,6 @@
 import os
 
+
 def nowsep(p0='-'):
     import datetime
     def_now = datetime.datetime.now()
@@ -18,6 +19,7 @@ def create_rundir(label='', wkplc='C:'):
     dir_nm = wkplc + '/' + label + '_' + nowsep()
     os.mkdir(dir_nm)
     return dir_nm
+
 
 def status(msg='Status message', process=True):
     if process:
