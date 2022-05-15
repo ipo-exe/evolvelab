@@ -2,6 +2,7 @@
 Recipes or proto-tools
 
 """
+import os
 
 
 def evolution_2d_recipe():
@@ -17,7 +18,7 @@ def evolution_2d_recipe():
     folder = '/home/ipora/Documents/bin'
     folder = 'C:/bin'
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus']
-    kind = kinds[1]
+    kind = kinds[2]
     wkpl = True
     label = kind
     # folder setup
@@ -25,30 +26,31 @@ def evolution_2d_recipe():
         if label != '':
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
-    generations = 20
+    generations = 50
     lo_x = -5
     hi_x = 5
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 200
-    mutt = 30
+    popsize = 400
+    std = 5
     trace = True
+    # definir df
     ranges_df = pd.DataFrame({'Lo': [lo_x, lo_y],
                               'Hi': [hi_x, hi_y],
                               'Labels': ['X', 'Y']})
-    out = evolve(df_genes=ranges_df,
-                 generations=generations,
-                 popsize=popsize,
-                 trace=trace,
-                 mutt=mutt,
-                 coarse=True)
-    # todo
-    """
-    O score das gerações está certo, mas as soluções nao estao - defasadas
-    
-    """
 
+    out = evolve(df_genes=ranges_df,
+                 n_generations=generations,
+                 n_popsize=popsize,
+                 b_trace=trace,
+                 std=std,
+                 r_mutt=0.01,
+                 b_coarse=True,
+                 b_recomb=False,
+                 b_explore=False,
+                 upper=100,
+                 lower=80)
 
     curve_df = out['Curve']
     convergence(curve_df=curve_df, folder=folder, show=False)
@@ -92,7 +94,8 @@ def evolution_2d_recipe():
             # plot
             pannel_2d_generation(lcl_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize, folder=folder, show=False)
         status('plotting gif')
-        export_gif(dir_images=folder, nm_gif='animation', kind='png', suf='G')
+        export_gif(dir_output=folder, dir_images=folder, nm_gif='animation', kind='png', suf='G')
+        os.startfile(folder)
 
 
 evolution_2d_recipe()

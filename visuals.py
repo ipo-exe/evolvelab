@@ -132,16 +132,6 @@ def himmelblaus_2d_plots(folder='C:/bin', filename='convergence', suff='', show=
 def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
                          x_lbl='X', y_lbl='Y', folder='C:/bin', suff='', show=True, dark=True):
 
-    def id_label(id):
-        if id < 10:
-            return '000' + str(id)
-        elif id >= 10 and id < 100:
-            return '00' + str(id)
-        elif id >= 100 and id < 1000:
-            return '0' + str(id)
-        elif id >= 1000 and id < 10000:
-            return str(id)
-
     marker_color = 'k'
     z_cmap = 'Spectral'
     if dark:
@@ -190,7 +180,7 @@ def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
     plt.ylim(zmin, zmax * 1.1)
     plt.xlabel('x')
     plt.ylabel('Score')
-    filename = 'G' + id_label(g) + '.png'
+    filename = 'G' + str(g).zfill(6)
     if show:
         plt.show()
         plt.close(fig)
