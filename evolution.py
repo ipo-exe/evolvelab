@@ -338,8 +338,9 @@ def evolve_2d_function(lo_x, hi_x, lo_y, hi_y, mid_x, mid_y,
 def evolve(df_genes,
            n_generations=10,
            n_popsize=10,
-           std=1,
+           r_std=0.01,
            r_mutt=0.05,
+           kind = 'paraboloid',
            b_coarse=True,
            b_trace=True,
            b_recomb=True,
@@ -347,7 +348,7 @@ def evolve(df_genes,
            upper=90,
            lower=80):
 
-    from benchmark import rastrigin_2d, paraboloid_2d, himmelblaus
+    from benchmark import rastrigin_2d, paraboloid_2d, himmelblaus, griewank_2d
     from datetime import datetime
     from backend import status
     from sys import getsizeof
@@ -381,6 +382,8 @@ def evolve(df_genes,
     else:
         s_dtype = 'uint16'
         n_high = 65535
+    # standard deviation setup
+    std = int(r_std * n_high)
 
     # get gene size:
     n_genesize = len(df_genes['Hi'])
@@ -459,10 +462,8 @@ def evolve(df_genes,
         v_parents_scores = np.zeros(shape=n_popsize, dtype='float')
         v_offspring_scores = np.zeros(shape=n_popsize, dtype='float')
         # declare a map (dictionary) to assess the full population without duplicate variables in memory
-        dct_population = {'Parents': {'Genes': grd_parents,
-                                  'Scores': v_parents_scores},
-                      'Offspring': {'Genes': grd_offspring,
-                                    'Scores': v_offspring_scores}}
+        dct_population = {'Parents': {'Genes': grd_parents, 'Scores': v_parents_scores},
+                          'Offspring': {'Genes': grd_offspring, 'Scores': v_offspring_scores}}
 
         # evaluation operator loop
         for i in range(2 * n_popsize):
@@ -480,8 +481,18 @@ def evolve(df_genes,
 
 
             # compute objective function
-            dct_population[lcl_key]['Scores'][lcl_id] = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
-            ##dct_population[lcl_key]['Scores'][lcl_id] = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            if kind == 'rastrigin':
+                lcl_score_value = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            elif kind == 'himmelblaus':
+                lcl_score_value = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            elif kind == 'griewank':
+                lcl_score_value = griewank_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            elif kind == 'paraboloid':
+                lcl_score_value = paraboloid_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            else:
+                lcl_score_value = paraboloid_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            dct_population[lcl_key]['Scores'][lcl_id] = lcl_score_value
+            ##dct_population[lcl_key]['Scores'][lcl_id] =
 
         # trace parents and offspring at this point
         if b_trace:
@@ -503,8 +514,8 @@ def evolve(df_genes,
             df_scores['Exploration'] = df_scores['Exploration'].values * (df_scores['Score'].values >= lower) * \
                                        ((df_scores['Score'].values <= upper))
             df_scores.sort_values(by='Exploration', ascending=False, inplace=True)  # sort scores and ids
-        else: # fitness
-            # sort scores
+        else: # fitness MAXIMIZING
+            # sort scores --
             df_scores.sort_values(by='Score', ascending=False, inplace=True)  # sort scores and ids
 
         # smart collector of ids

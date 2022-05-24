@@ -150,7 +150,7 @@ def run_rand(n_gens, n_grid, wkpl='C:/bin', keep_frames=True, r_density=0.1, n_s
     # export
     plt.style.use('dark_background')
     for i in range(len(grd_run)):
-        plt.imshow(grid[i], cmap='Greys_r')
+        plt.imshow(grd_run[i], cmap='Greys_r')
         plt.savefig('{}/CGL_{}.png'.format(dir_frames, str(i).zfill(4)))
         plt.close()
     export_gif(dir_output=dir_out, dir_images=dir_frames, nm_gif='animation', kind='png', suf='')

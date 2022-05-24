@@ -11,9 +11,8 @@ Spoilers of the package - evolution in the Himmelblaus function:
 The pseudo-code:
 ```markdown
 start
-    get POPSIZE
-    get GENERATIONS
-    get ELITISM
+    get N_POPSIZE
+    get N_GENERATIONS
     generate PARENTS with POPSIZE
     evaluate PARENTS fitness scores
     set g = 0
@@ -73,3 +72,16 @@ where `level`, `x0` and `y0` are pre-set parameters
 Example of `level=1000`, `x0=5`, `y0=5`:
 
 ![himm](https://github.com/ipo-exe/evolvelab/blob/main/docs/himm.png "himm")
+
+### the `griewank` function
+
+Equation:
+
+```markdown
+level - 100 * (((square(x) + square(y)) / 4000) - (cos(x) * cos(y / sqrt(2))) + 1)
+```
+where `level`, `x0` and `y0` are pre-set parameters
+
+Example of `level=100`, `x0=5`, `y0=5`:
+
+![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/parab.png "grie")

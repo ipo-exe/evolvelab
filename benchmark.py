@@ -5,7 +5,7 @@ Module to store benchmark functions
 import numpy as np
 
 
-def griewank_2d(x, y, x0=50, y0=50, level=4):
+def griewank_2d(x, y, x0=50, y0=50, level=100):
     """
     compute the 2D Griewank Function (upside down by level)
     :param x: float of x
@@ -18,7 +18,7 @@ def griewank_2d(x, y, x0=50, y0=50, level=4):
     # set center
     x = x - x0
     y = y - y0
-    return level - (((np.square(x) + np.square(y)) / 4000) - (np.cos(x) * np.cos(y / np.sqrt(2))) + 1)
+    return level - 100 * (((np.square(x) + np.square(y)) / 4000) - (np.cos(x) * np.cos(y / np.sqrt(2))) + 1)
 
 
 def paraboloid_2d(x, y, x0=50, y0=50, level=100):
