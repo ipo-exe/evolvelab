@@ -84,4 +84,4 @@ where `level`, `x0` and `y0` are pre-set parameters
 
 Example of `level=100`, `x0=5`, `y0=5`:
 
-![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/parab.png "grie")
+![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/grie.png "grie")
