@@ -18,7 +18,7 @@ def evolution_2d_recipe():
     folder = '/home/ipora/Documents/bin'
     folder = 'C:/bin'
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus']
-    kind = kinds[2]
+    kind = kinds[1]
     wkpl = True
     label = kind
     # folder setup
@@ -26,14 +26,14 @@ def evolution_2d_recipe():
         if label != '':
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
-    generations = 50
+    generations = 100
     lo_x = -5
     hi_x = 5
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 400
-    std = 5
+    popsize = 100
+    std = 15
     trace = True
     # definir df
     ranges_df = pd.DataFrame({'Lo': [lo_x, lo_y],
@@ -45,10 +45,10 @@ def evolution_2d_recipe():
                  n_popsize=popsize,
                  b_trace=trace,
                  std=std,
-                 r_mutt=0.01,
-                 b_coarse=True,
+                 r_mutt=0.1,
+                 b_coarse=False,
                  b_recomb=False,
-                 b_explore=False,
+                 b_explore=True,
                  upper=100,
                  lower=80)
 

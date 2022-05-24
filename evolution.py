@@ -409,8 +409,8 @@ def evolve(df_genes,
         status(msg='traced scores array size: {} KB'.format(getsizeof(grd_tcd_offpring_scores) / 1000), process=False)
 
     # get initial population:
-    ### grd_parents = np.random.randint(low=0, high=_high, size=(popsize, genesize), dtype=_dtype)
-    grd_parents = int(n_high / 2) + np.zeros(shape=(n_popsize, n_genesize), dtype=s_dtype)
+    grd_parents = np.random.randint(low=0, high=n_high, size=(n_popsize, n_genesize), dtype=s_dtype)
+    ##grd_parents = int(n_high / 2) + np.zeros(shape=(n_popsize, n_genesize), dtype=s_dtype)
 
     # generations loop:
     for g in range(0, n_generations):
@@ -446,14 +446,14 @@ def evolve(df_genes,
         grd_muttation_mask = np.random.normal(loc=0, scale=std, size=np.shape(grd_offspring)).astype(dtype=s_dtype)
         grd_offspring = grd_offspring + grd_muttation_mask # offsprint +- a normal change
 
-        # apply variation operatio (mutation -- spore propagation)
+        # apply variation operation (mutation -- spore propagation)
         n_spores_determ = int(n_popsize * r_mutt)  # deterministic number of mutations
         n_spores_stocas = int(np.random.normal(loc=n_spores_determ, scale=n_spores_determ / 20)) # normal variation
+        grd_new_random_genes = np.random.randint(0, high=n_high, size=n_genesize) # new random genes
         v_muttation_ids = np.random.randint(0, high=n_popsize - 1, size=n_spores_stocas)  # which genes will mutate
-        grd_new_random_genes = np.random.randint(0, high=n_high, size=(n_spores_stocas, n_genesize)) # new random genes
         for i in range(n_spores_stocas):
             lcl_id = v_muttation_ids[i]
-            grd_offspring[lcl_id] = grd_new_random_genes[i]
+            grd_offspring[lcl_id] = grd_new_random_genes
 
         # evaluate full population at once
         v_parents_scores = np.zeros(shape=n_popsize, dtype='float')
@@ -480,9 +480,8 @@ def evolve(df_genes,
 
 
             # compute objective function
-            ###dct_population[lcl_key]['Scores'][lcl_id] = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
-            dct_population[lcl_key]['Scores'][lcl_id] = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0,
-                                                                     level=100)
+            dct_population[lcl_key]['Scores'][lcl_id] = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+            ##dct_population[lcl_key]['Scores'][lcl_id] = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
 
         # trace parents and offspring at this point
         if b_trace:
@@ -500,7 +499,7 @@ def evolve(df_genes,
         # exploration or fitness
         if b_explore:
             df_scores = pd.DataFrame({'Id': np.arange(len(v_scores)), 'Score': v_scores})
-            df_scores['Exploration'] = 1.0
+            df_scores['Exploration'] = np.random.randint(0, 100, size=len(df_scores))
             df_scores['Exploration'] = df_scores['Exploration'].values * (df_scores['Score'].values >= lower) * \
                                        ((df_scores['Score'].values <= upper))
             df_scores.sort_values(by='Exploration', ascending=False, inplace=True)  # sort scores and ids
