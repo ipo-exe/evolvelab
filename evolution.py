@@ -339,12 +339,12 @@ def evolve(df_genes,
            n_generations=10,
            n_popsize=10,
            r_std=0.01,
-           r_mutt=0.05,
            kind = 'paraboloid',
            b_coarse=True,
            b_trace=True,
            b_recomb=True,
            b_explore=False,
+           b_minimize=False,
            upper=90,
            lower=80):
 
@@ -373,6 +373,20 @@ def evolve(df_genes,
         output = (gene_a + gene_b) / 2
         output = output.astype(origin_type)
         return output
+
+
+    def compute_fitness(kind, lcl_gene):
+        if kind == 'rastrigin':
+            lcl_score_value = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+        elif kind == 'himmelblaus':
+            lcl_score_value = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+        elif kind == 'griewank':
+            lcl_score_value = griewank_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+        elif kind == 'paraboloid':
+            lcl_score_value = paraboloid_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+        else:
+            lcl_score_value = paraboloid_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+        return lcl_score_value
 
 
     # resolution setup
@@ -424,12 +438,14 @@ def evolve(df_genes,
         # reset random state
         np.random.seed(v_seeds[g])
 
-        # shuffle parents
-        ### np.random.shuffle(grd_parents)
-
         # get offspring from parents:
         grd_offspring = grd_parents.copy()
 
+        # recombination option:
+        """
+        # shuffle parents
+        np.random.shuffle(grd_parents)
+        
         # apply variation operator (recombination)
         if b_recomb:
             for i in range(len(grd_parents)):
@@ -446,59 +462,50 @@ def evolve(df_genes,
                                                    origin_type=s_dtype)
                 # replace in grid
                 grd_offspring[i] = lcl_gene_offs.astype(s_dtype)
+        """
 
         # apply variation operator (mutation -- rizome propagation):
-        grd_muttation_mask = np.random.normal(loc=0, scale=std, size=np.shape(grd_offspring)).astype(dtype=s_dtype)
-        grd_offspring = grd_offspring + grd_muttation_mask # offsprint +- a normal change
-
-        """
-        # apply variation operation (mutation -- spore propagation)
-        n_spores_determ = int(n_popsize * r_mutt)  # deterministic number of mutations
-        n_spores_stocas = int(np.random.normal(loc=n_spores_determ, scale=n_spores_determ / 20)) # normal variation
-        #grd_new_random_genes = np.random.randint(0, high=n_high, size=n_genesize) # new random genes
-        v_muttation_ids = np.random.randint(0, high=n_popsize - 1, size=n_spores_stocas)  # which genes will mutate
-        for i in range(n_spores_stocas):
-            lcl_id = v_muttation_ids[i]
-            grd_offspring[lcl_id] = np.random.randint(0, high=n_high, size=n_genesize) # new random genes
-        """
+        grd_muttation_delta = np.random.normal(loc=0, scale=std, size=np.shape(grd_offspring)).astype(dtype=s_dtype)
+        grd_offspring = grd_offspring + grd_muttation_delta # offsprint +- a normal change
 
         # evaluate full population at once
-        v_parents_scores = np.zeros(shape=n_popsize, dtype='float')
+
+        # declare scores arrays
+        if g == 0:
+            v_parents_scores = np.zeros(shape=n_popsize, dtype='float') # initialize parents scores array
         v_offspring_scores = np.zeros(shape=n_popsize, dtype='float')
         # declare a map (dictionary) to assess the full population without duplicate variables in memory
         dct_population = {'Parents': {'Genes': grd_parents, 'Scores': v_parents_scores},
                           'Offspring': {'Genes': grd_offspring, 'Scores': v_offspring_scores}}
 
         # evaluation operator loop
-        for i in range(2 * n_popsize):
-
-            # decide key
-            lcl_key = 'Parents'
-            lcl_id = i
-            if i >= n_popsize:
+        if g == 0: # evaluate parents and offspring
+            for i in range(2 * n_popsize):
+                # decide key
+                lcl_key = 'Parents'
+                lcl_id = i
+                if i >= n_popsize:
+                    lcl_key = 'Offspring'
+                    lcl_id = i - n_popsize
+                # express parent gene
+                lcl_gene = express_gene(x=dct_population[lcl_key]['Genes'][lcl_id],
+                                        x_hi=n_high,
+                                        y_lo=df_genes['Lo'].values,
+                                        y_hi=df_genes['Hi'].values)
+                # compute objective function
+                dct_population[lcl_key]['Scores'][lcl_id] = compute_fitness(kind=kind, lcl_gene=lcl_gene)
+        else:  # evaluate only offspring
+            for i in range(n_popsize):
+                # decide key
                 lcl_key = 'Offspring'
-                lcl_id = i - n_popsize
-
-            # express parent gene
-            lcl_gene = express_gene(x=dct_population[lcl_key]['Genes'][lcl_id],
-                                    x_hi=n_high,
-                                    y_lo=df_genes['Lo'].values,
-                                    y_hi=df_genes['Hi'].values)
-
-            # compute objective function
-            if kind == 'rastrigin':
-                lcl_score_value = rastrigin_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
-            elif kind == 'himmelblaus':
-                lcl_score_value = himmelblaus(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
-            elif kind == 'griewank':
-                lcl_score_value = griewank_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
-            elif kind == 'paraboloid':
-                lcl_score_value = paraboloid_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
-            else:
-                lcl_score_value = paraboloid_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
-
-            # set score
-            dct_population[lcl_key]['Scores'][lcl_id] = lcl_score_value
+                lcl_id = i
+                # express parent gene
+                lcl_gene = express_gene(x=dct_population[lcl_key]['Genes'][lcl_id],
+                                        x_hi=n_high,
+                                        y_lo=df_genes['Lo'].values,
+                                        y_hi=df_genes['Hi'].values)
+                # compute objective function
+                dct_population[lcl_key]['Scores'][lcl_id] = compute_fitness(kind=kind, lcl_gene=lcl_gene)
 
         # trace parents and offspring at this point
         if b_trace:
@@ -509,34 +516,39 @@ def evolve(df_genes,
 
         # retrieve best next parents
         v_scores = np.concatenate((v_parents_scores, v_offspring_scores))  # merge scores parents FIRST
-        first_key = 'Parents'
-        second_key = 'Offspring'
-        df_scores = pd.DataFrame({'Id': np.arange(len(v_scores)), 'Score': v_scores})
+        df_scores = pd.DataFrame({'Id': np.arange(len(v_scores)), 'Score': v_scores})  # create indexed dataframe
 
         # exploration or fitness
         if b_explore:
-            df_scores = pd.DataFrame({'Id': np.arange(len(v_scores)), 'Score': v_scores})
+            # Exploration field defined as random integer:
             df_scores['Exploration'] = np.random.randint(0, 100, size=len(df_scores))
+            # set Exploration = 0 when not meet the exploration criteria:
             df_scores['Exploration'] = df_scores['Exploration'].values * (df_scores['Score'].values >= lower) * \
                                        ((df_scores['Score'].values <= upper))
-            df_scores.sort_values(by='Exploration', ascending=False, inplace=True)  # sort scores and ids
+            # sort Exploration field:
+            df_scores.sort_values(by='Exploration', ascending=b_minimize, inplace=True)  # sort scores and ids
         else: # fitness MAXIMIZING
-            # sort scores --
-            df_scores.sort_values(by='Score', ascending=False, inplace=True)  # sort scores and ids
+            # sort Score field:
+            df_scores.sort_values(by='Score', ascending=b_minimize, inplace=True)  # sort scores and ids
 
         # smart collector of ids
         for i in range(n_popsize):
+
             # use id to retrieve from population
             lcl_score_id = df_scores['Id'].values[i]
+
             # smart trick to access population
-            if lcl_score_id >= n_popsize:
-                lcl_key = second_key
+            if lcl_score_id >= n_popsize:  # is an offspring solution
+                lcl_key = 'Offspring'
                 lcl_id = lcl_score_id - n_popsize
-            else:
-                lcl_key = first_key
+            else:  # is a parent solution
+                lcl_key = 'Parents'
                 lcl_id = lcl_score_id
-            # replace parent
+
+            # replace parent:
             grd_parents[i] = dct_population[lcl_key]['Genes'][lcl_id]
+            # replace parent score:
+            v_parents_scores[i] = df_scores['Score'].values[i]
 
         # store best score
         df_evolution_curve['Best_S'].values[g] = np.max(v_parents_scores)

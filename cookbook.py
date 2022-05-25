@@ -47,7 +47,7 @@ def evolution_2d_recipe():
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 200
+    popsize = 400
     r_std = 0.8
     trace = True
     # definir df
@@ -60,13 +60,12 @@ def evolution_2d_recipe():
                  n_popsize=popsize,
                  b_trace=trace,
                  r_std=r_std,
-                 r_mutt=0.1,
                  kind = kind,
                  b_coarse=True,
                  b_recomb=False,
                  b_explore=True,
-                 upper=100,
-                 lower=90)
+                 upper=80,
+                 lower=40)
     # retrieve curve dataframe
     curve_df = out['Curve']
     # plot convergence

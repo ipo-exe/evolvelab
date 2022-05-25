@@ -1,39 +1,43 @@
 # evolvelab
 Evolutionary computing lab. For evolutionary computing stuff and experiments.
 
-Spoilers of the package - evolution in the Himmelblaus function: 
 
-![anim](https://github.com/ipo-exe/evolvelab/blob/main/docs/spoiler.gif "spoiler")
-
-
-## 2d evolutionary algorithm
+## The evolutionary algorithm
+The algorithm is designed both for optimization and exploration. 
+When EXPLORE = TRUE, the procedure is set to find solutions within a certain range of the fitness score.
+When EXPLORE = FALSE, the procedure is set to find solution that maximize (or minimize) the fitness score.
 
 The pseudo-code:
 ```markdown
 start
-    get N_GRID as integer
+    get EXPLORE as boolean
     get N_POPSIZE as integer
     get N_GENERATIONS as integer
+    get N_GRID as integer
     get R_STD as real
     set STD = R_STD * N_GRID
     generate PARENTS with POPSIZE
+    evaluate PARENTS using FITNESS() function
     set g = 0
     repeat until g > GENERATIONS:
-        shuffe PARENTS
         set DELTA = NORMAL(mean=0, standard=STD)
         set OFFSPRING = PARENTS + DELTA
+        evaluate OFFSPRING using FITNESS() function
         merge OFFSPRING with PARENTS in POOL
-        select next generation PARENTS from POOL
-        if ELITISM == True:
-            sort POOL by fitness scores
-            select from POOL the best POPSIZE SAMPLE
+        if EXPLORE == TRUE:
+            sort POOL by exploration criteria
         else:
-            select from POOL a POPSIZE SAMPLE using RWS method
+            sort POOL by fitness score
+        select from POOL the best POPSIZE SAMPLE
         set PARENTS = SAMPLE
         set g = g + 1
     return PARENTS
 end
 ```
+
+Spoilers of the package - exploration in the Himmelblaus function: 
+
+![anim](https://github.com/ipo-exe/evolvelab/blob/main/docs/spoiler.gif "spoiler")
 
 ### benchmark 2d functions
 
