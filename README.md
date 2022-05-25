@@ -1,11 +1,10 @@
 # evolvelab
 Evolutionary computing lab. For evolutionary computing stuff and experiments.
 
-
 ## The evolutionary algorithm
 The algorithm is designed both for optimization and exploration. 
-When EXPLORE = TRUE, the procedure is set to find solutions within a certain range of the fitness score.
-When EXPLORE = FALSE, the procedure is set to find solution that maximize (or minimize) the fitness score.
+When `EXPLORE = TRUE`, the procedure is set to find solutions within a certain range of the fitness score.
+When `EXPLORE = FALSE`, the procedure is set to find solution that maximize (or minimize) the fitness score.
 
 The pseudo-code:
 ```markdown
