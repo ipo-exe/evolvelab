@@ -382,6 +382,7 @@ def evolve(df_genes,
     else:
         s_dtype = 'uint16'
         n_high = 65535
+
     # standard deviation setup
     std = int(r_std * n_high)
 
@@ -390,6 +391,7 @@ def evolve(df_genes,
 
     # set overall random state
     seed = int(str(datetime.now())[-6:])
+
     # get random seeds for each generation
     v_seeds = np.random.randint(100, 1000, size=n_generations)
 
@@ -412,8 +414,8 @@ def evolve(df_genes,
         status(msg='traced scores array size: {} KB'.format(getsizeof(grd_tcd_offpring_scores) / 1000), process=False)
 
     # get initial population:
-    grd_parents = np.random.randint(low=0, high=n_high, size=(n_popsize, n_genesize), dtype=s_dtype)
-    ##grd_parents = int(n_high / 2) + np.zeros(shape=(n_popsize, n_genesize), dtype=s_dtype)
+    ##grd_parents = np.random.randint(low=0, high=n_high, size=(n_popsize, n_genesize), dtype=s_dtype)
+    grd_parents = int(n_high / 10) + np.zeros(shape=(n_popsize, n_genesize), dtype=s_dtype)
 
     # generations loop:
     for g in range(0, n_generations):
@@ -423,7 +425,7 @@ def evolve(df_genes,
         np.random.seed(v_seeds[g])
 
         # shuffle parents
-        np.random.shuffle(grd_parents)
+        ### np.random.shuffle(grd_parents)
 
         # get offspring from parents:
         grd_offspring = grd_parents.copy()
@@ -449,14 +451,16 @@ def evolve(df_genes,
         grd_muttation_mask = np.random.normal(loc=0, scale=std, size=np.shape(grd_offspring)).astype(dtype=s_dtype)
         grd_offspring = grd_offspring + grd_muttation_mask # offsprint +- a normal change
 
+        """
         # apply variation operation (mutation -- spore propagation)
         n_spores_determ = int(n_popsize * r_mutt)  # deterministic number of mutations
         n_spores_stocas = int(np.random.normal(loc=n_spores_determ, scale=n_spores_determ / 20)) # normal variation
-        grd_new_random_genes = np.random.randint(0, high=n_high, size=n_genesize) # new random genes
+        #grd_new_random_genes = np.random.randint(0, high=n_high, size=n_genesize) # new random genes
         v_muttation_ids = np.random.randint(0, high=n_popsize - 1, size=n_spores_stocas)  # which genes will mutate
         for i in range(n_spores_stocas):
             lcl_id = v_muttation_ids[i]
-            grd_offspring[lcl_id] = grd_new_random_genes
+            grd_offspring[lcl_id] = np.random.randint(0, high=n_high, size=n_genesize) # new random genes
+        """
 
         # evaluate full population at once
         v_parents_scores = np.zeros(shape=n_popsize, dtype='float')
@@ -467,18 +471,19 @@ def evolve(df_genes,
 
         # evaluation operator loop
         for i in range(2 * n_popsize):
+
             # decide key
             lcl_key = 'Parents'
             lcl_id = i
             if i >= n_popsize:
                 lcl_key = 'Offspring'
                 lcl_id = i - n_popsize
+
             # express parent gene
             lcl_gene = express_gene(x=dct_population[lcl_key]['Genes'][lcl_id],
                                     x_hi=n_high,
                                     y_lo=df_genes['Lo'].values,
                                     y_hi=df_genes['Hi'].values)
-
 
             # compute objective function
             if kind == 'rastrigin':
@@ -491,8 +496,9 @@ def evolve(df_genes,
                 lcl_score_value = paraboloid_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
             else:
                 lcl_score_value = paraboloid_2d(x=lcl_gene[0], y=lcl_gene[1], x0=0, y0=0, level=100)
+
+            # set score
             dct_population[lcl_key]['Scores'][lcl_id] = lcl_score_value
-            ##dct_population[lcl_key]['Scores'][lcl_id] =
 
         # trace parents and offspring at this point
         if b_trace:

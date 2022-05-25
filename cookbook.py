@@ -32,7 +32,7 @@ def evolution_2d_recipe():
     folder = '/home/ipora/Documents/bin'
     #folder = 'C:/bin'
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus', 'griewank']
-    kind = kinds[1]
+    kind = kinds[2]
     wkpl = True
     label = kind
     # folder setup
@@ -41,14 +41,14 @@ def evolution_2d_recipe():
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
     # parameters setup
-    generations = 50
+    generations = 100
     lo_x = -5
     hi_x = 5
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 100
-    r_std = 0.1
+    popsize = 200
+    r_std = 0.8
     trace = True
     # definir df
     ranges_df = pd.DataFrame({'Lo': [lo_x, lo_y],
@@ -66,7 +66,7 @@ def evolution_2d_recipe():
                  b_recomb=False,
                  b_explore=True,
                  upper=100,
-                 lower=80)
+                 lower=90)
     # retrieve curve dataframe
     curve_df = out['Curve']
     # plot convergence

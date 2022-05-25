@@ -11,14 +11,17 @@ Spoilers of the package - evolution in the Himmelblaus function:
 The pseudo-code:
 ```markdown
 start
-    get N_POPSIZE
-    get N_GENERATIONS
+    get N_GRID as integer
+    get N_POPSIZE as integer
+    get N_GENERATIONS as integer
+    get R_STD as real
+    set STD = R_STD * N_GRID
     generate PARENTS with POPSIZE
-    evaluate PARENTS fitness scores
     set g = 0
     repeat until g > GENERATIONS:
-        generate OFFSPRING using PARENTS
-        evaluate OFFSPRING fitness scores
+        shuffe PARENTS
+        set DELTA = NORMAL(mean=0, standard=STD)
+        set OFFSPRING = PARENTS + DELTA
         merge OFFSPRING with PARENTS in POOL
         select next generation PARENTS from POOL
         if ELITISM == True:
