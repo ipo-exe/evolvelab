@@ -40,12 +40,12 @@ start
     get N_GENERATIONS as integer
     get N_GRID as integer
     get R_STD as real
-    set STD = R_STD * N_GRID
-    generate PARENTS with POPSIZE
+    set STD = R_STD * N_GRID as integer
+    generate PARENTS as integer with POPSIZE
     evaluate PARENTS using FITNESS() function
     set g = 0
     repeat until g > GENERATIONS:
-        set DELTA = NORMAL(mean=0, standard=STD)
+        set DELTA = NORMAL(mean=0, standard=STD) as integer
         set OFFSPRING = PARENTS + DELTA
         evaluate OFFSPRING using FITNESS() function
         merge OFFSPRING with PARENTS in POOL
