@@ -7,7 +7,6 @@ The algorithm is based on the [evolution strategy](https://en.wikipedia.org/wiki
 2. merge the changed solutions with the original ones (offspring recruitment).
 3. select only the set of best solutions (elitism).
 
-The strength of the variation operator is defined by the standard deviation `STD` of the normally distributed random vector. 
 Solutions are encoded in the integer format (i.e., fixed searching grid). 
 There is two options :
 1. coarse grid: `uint8` 8 bit encoding, varying from 0 to 255.
@@ -20,6 +19,14 @@ f = (g * (f_hi - f_lo) / g_hi) + f_lo
 Where `f` in the fenotype (real number), `g` is the genotype (integer number), 
 `f_lo` and `f_hi` are the lower and upper bounds of the searching range of the fenotype (real numbers), respectively; 
 and `g_hi` is the upper value of the searching grid (255 or 65535).
+
+The strength of the variation operator is defined by the standard deviation `STD` 
+of the normally distributed random vector. The vector is computed in the genetype domain (i.e., in integer values).
+So the `STD` is computed from a rate parameter:
+```markdown
+STD = R_STD * N_GRID
+```
+Where `R_STD` is a rate value (0 to 1) and `N_GRID` is the grid resolution, so `N_GRID = g_hi`.
 
 The algorithm is designed both for optimization and exploration.
 When `EXPLORE = TRUE`, the procedure is set to find solutions within a certain range of the fitness score.
