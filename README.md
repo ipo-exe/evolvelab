@@ -24,7 +24,7 @@ The strength of the variation operator is defined by the standard deviation `STD
 of the normally distributed random vector. The vector is computed in the genetype domain (i.e., in integer values).
 So the `STD` is computed from a rate parameter:
 ```markdown
-STD = R_STD * N_GRID
+STD = integer(R_STD * N_GRID)
 ```
 Where `R_STD` is a rate value (0 to 1) and `N_GRID` is the grid resolution, so `N_GRID = g_hi`.
 
