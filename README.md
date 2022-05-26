@@ -6,10 +6,10 @@ The algorithm is designed both for optimization and exploration.
 When `EXPLORE = TRUE`, the procedure is set to find solutions within a certain range of the fitness score.
 When `EXPLORE = FALSE`, the procedure is set to find solution that maximize (or minimize) the fitness score.
 
-It is based on the evolutionary strategies framework, so there is only three rules:
-1 -  change all solutions by adding a normally distributed random vector (variation operator).
-2 -  merge the changed solutions with the original ones (offspring recruitment).
-3 -  select only the set of best solutions (elitism).
+It is based on the [evolution strategy](https://en.wikipedia.org/wiki/Evolution_strategy) framework, so there is only three rules:
+1.  change all solutions by adding a normally distributed random vector (variation operator).
+2.  merge the changed solutions with the original ones (offspring recruitment).
+3.  select only the set of best solutions (elitism).
 
 The pseudo-code:
 ```markdown
