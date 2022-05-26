@@ -14,6 +14,8 @@ def view_function():
     #visuals.rastrigin_2d_plots(folder='/home/ipora/PycharmProjects/evolve3/docs', filename='rastr_2d', show=False)
     #visuals.paraboloid_2d_plots(folder='/home/ipora/PycharmProjects/evolve3/docs', filename='parab', show=False)
 
+def plot_2d_evolution():
+
 
 def evolution_2d_recipe():
     """
@@ -41,13 +43,13 @@ def evolution_2d_recipe():
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
     # parameters setup
-    generations = 100
+    generations = 20
     lo_x = -5
     hi_x = 5
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 400
+    popsize = 100
     r_std = 0.8
     trace = True
     # definir df
@@ -70,9 +72,14 @@ def evolution_2d_recipe():
     curve_df = out['Curve']
     # plot convergence
     convergence(curve_df=curve_df, folder=folder, show=False)
-    # export
+    # export curve csv:
     fpath = folder + '/convergence.txt'
     curve_df.to_csv(fpath, sep=';', index=False)
+    # retrieve traced dataframe
+    trace_df = out['Traced']
+    # export trace csv:
+    fpath = folder + '/evolution.txt'
+    trace_df.to_csv(fpath, sep=';', index=False)
 
     # plotting
     if trace:
@@ -88,8 +95,6 @@ def evolution_2d_recipe():
             from benchmark import griewank_2d
         else:
             from benchmark import paraboloid_2d
-        # retrieve traced dataframe
-        trace_df = out['Traced']
         #
         # define density
         density = 500
