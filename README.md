@@ -2,14 +2,28 @@
 Evolutionary computing lab. For evolutionary computing stuff and experiments.
 
 ## The evolutionary algorithm
+The algorithm is based on the [evolution strategy](https://en.wikipedia.org/wiki/Evolution_strategy) framework, so there is only three rules:
+1. change all current solutions by adding a normally distributed random vector (variation operator).
+2. merge the changed solutions with the original ones (offspring recruitment).
+3. select only the set of best solutions (elitism).
+
+The strength of the variation operator is defined by the standard deviation `STD` of the normally distributed random vector. 
+Solutions are encoded in the integer format (i.e., fixed searching grid). 
+There is two options :
+1. coarse grid: `uint8` 8 bit encoding, varying from 0 to 255.
+2. fine grid: `uint16` 16 bit encoding, varying from 0 to 65535.
+
+Solution decoding from gene to fenotype is performed by the following formula:
+```markdown
+f = (g * (f_hi - f_lo) / g_hi) + f_lo
+```
+Where `f` in the fenotype (real number), `g` is the genotype (integer number), 
+`f_lo` and `f_hi` are the lower and upper bounds of the searching range of the fenotype (real numbers), respectively; 
+and `g_hi` is the upper value of the searching grid (255 or 65535).
+
 The algorithm is designed both for optimization and exploration.
 When `EXPLORE = TRUE`, the procedure is set to find solutions within a certain range of the fitness score.
 When `EXPLORE = FALSE`, the procedure is set to find solution that maximize (or minimize) the fitness score.
-
-It is based on the [evolution strategy](https://en.wikipedia.org/wiki/Evolution_strategy) framework, so there is only three rules:
-1.  change all solutions by adding a normally distributed random vector (variation operator).
-2.  merge the changed solutions with the original ones (offspring recruitment).
-3.  select only the set of best solutions (elitism).
 
 The pseudo-code:
 ```markdown
@@ -50,7 +64,7 @@ Spoilers of the package - exploration in the Himmelblaus function:
 Equation:
 
 ```markdown
-level - (square(x - x0) + square(y - y0))
+f(x, y) = level - (square(x - x0) + square(y - y0))
 ```
 where `level`, `x0` and `y0` are pre-set parameters
 
@@ -63,7 +77,7 @@ Example of `level=100`, `x0=5`, `y0=5`:
 Equation:
 
 ```markdown
-level - (20 + (square(x - x0) - 10 * cos(2 * pi * (x - x0))) + (square(y - y0) - 10 * cos(2 * pi * (y - y0))))
+f(x, y) = level - (20 + (square(x - x0) - 10 * cos(2 * pi * (x - x0))) + (square(y - y0) - 10 * cos(2 * pi * (y - y0))))
 ```
 where `level`, `x0` and `y0` are pre-set parameters
 
@@ -76,7 +90,7 @@ Example of `level=100`, `x0=5`, `y0=5`:
 Equation:
 
 ```markdown
-level - (square(square(x - x0) + (y - y0) - 11) + square((x - x0) + square(y - y0) - 7))
+f(x, y) = level - (square(square(x - x0) + (y - y0) - 11) + square((x - x0) + square(y - y0) - 7))
 ```
 where `level`, `x0` and `y0` are pre-set parameters
 
@@ -89,7 +103,7 @@ Example of `level=1000`, `x0=5`, `y0=5`:
 Equation:
 
 ```markdown
-level - 100 * (((square(x) + square(y)) / 4000) - (cos(x) * cos(y / sqrt(2))) + 1)
+f(x, y) = level - 100 * (((square(x) + square(y)) / 4000) - (cos(x) * cos(y / sqrt(2))) + 1)
 ```
 where `level`, `x0` and `y0` are pre-set parameters
 
@@ -98,8 +112,6 @@ Example of `level=100`, `x0=5`, `y0=5`:
 ![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/grie.png "grie")
 
 
-##References
-
-
+## References
 
 Beyer, HG., Schwefel, HP. Evolution strategies – A comprehensive introduction. Natural Computing 1, 3–52 (2002). https://doi.org/10.1023/A:1015059928466

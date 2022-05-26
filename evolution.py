@@ -354,17 +354,17 @@ def evolve(df_genes,
     from sys import getsizeof
 
 
-    def express_gene(x, y_lo, y_hi, x_hi=255):
+    def express_gene(gene, feno_lo, feno_hi, gene_hi=255):
         """
         express a gene in float values
-        :param x: gene array or int
-        :param y_lo: lower bound array or float of y
-        :param y_hi: upper bound array or float of y
-        :param x_hi: upper bound array or float of x
+        :param gene: gene array or int
+        :param feno_lo: lower bound array or float of y
+        :param feno_hi: upper bound array or float of y
+        :param gene_hi: upper bound array or float of x
         :return: float array or float of gene phenotype
         """
-        _m = (y_hi - y_lo) / x_hi
-        return (_m * x) + y_lo
+        _m = (feno_hi - feno_lo) / gene_hi
+        return (_m * gene) + feno_lo
 
 
     def apply_gene_average(gene_a, gene_b, origin_type):
@@ -488,10 +488,10 @@ def evolve(df_genes,
                     lcl_key = 'Offspring'
                     lcl_id = i - n_popsize
                 # express parent gene
-                lcl_gene = express_gene(x=dct_population[lcl_key]['Genes'][lcl_id],
-                                        x_hi=n_high,
-                                        y_lo=df_genes['Lo'].values,
-                                        y_hi=df_genes['Hi'].values)
+                lcl_gene = express_gene(gene=dct_population[lcl_key]['Genes'][lcl_id],
+                                        gene_hi=n_high,
+                                        feno_lo=df_genes['Lo'].values,
+                                        feno_hi=df_genes['Hi'].values)
                 # compute objective function
                 dct_population[lcl_key]['Scores'][lcl_id] = compute_fitness(kind=kind, lcl_gene=lcl_gene)
         else:  # evaluate only offspring
@@ -500,10 +500,10 @@ def evolve(df_genes,
                 lcl_key = 'Offspring'
                 lcl_id = i
                 # express parent gene
-                lcl_gene = express_gene(x=dct_population[lcl_key]['Genes'][lcl_id],
-                                        x_hi=n_high,
-                                        y_lo=df_genes['Lo'].values,
-                                        y_hi=df_genes['Hi'].values)
+                lcl_gene = express_gene(gene=dct_population[lcl_key]['Genes'][lcl_id],
+                                        gene_hi=n_high,
+                                        feno_lo=df_genes['Lo'].values,
+                                        feno_hi=df_genes['Hi'].values)
                 # compute objective function
                 dct_population[lcl_key]['Scores'][lcl_id] = compute_fitness(kind=kind, lcl_gene=lcl_gene)
 
@@ -558,10 +558,10 @@ def evolve(df_genes,
 
 
 
-    last_best_solution = express_gene(x=grd_parents[0],
-                                      x_hi=n_high,
-                                      y_lo=df_genes['Lo'].values,
-                                      y_hi=df_genes['Hi'].values)
+    last_best_solution = express_gene(gene=grd_parents[0],
+                                      gene_hi=n_high,
+                                      feno_lo=df_genes['Lo'].values,
+                                      feno_hi=df_genes['Hi'].values)
     # define output dict
     dct_output = {'Curve': df_evolution_curve}
     # append keys
@@ -586,10 +586,10 @@ def evolve(df_genes,
                 # append score
                 df_trace['Score'].values[counter] = grd_tcd_parents_scores[g][i]
                 # express local solution
-                lcl_solution = express_gene(x=grd3_tcd_parents[g][i],
-                                            x_hi=n_high,
-                                            y_lo=df_genes['Lo'].values,
-                                            y_hi=df_genes['Hi'].values)
+                lcl_solution = express_gene(gene=grd3_tcd_parents[g][i],
+                                            gene_hi=n_high,
+                                            feno_lo=df_genes['Lo'].values,
+                                            feno_hi=df_genes['Hi'].values)
                 # append solution in fields
                 for j in range(len(df_genes['Labels'].values)):
                     df_trace[df_genes['Labels'].values[j]].values[counter] = lcl_solution[j]
