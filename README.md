@@ -32,6 +32,10 @@ The algorithm is designed both for optimization and exploration.
 When `EXPLORE = TRUE`, the procedure is set to find solutions within a certain range of the fitness score.
 When `EXPLORE = FALSE`, the procedure is set to find solution that maximize (or minimize) the fitness score.
 
+The algoritm algorithm lives in the `evolve()` function of the `evolution.py` file.
+It is designed to optimize any number of decision variables. 
+Custom objective functions can used.
+
 The pseudo-code:
 ```markdown
 start
@@ -119,7 +123,7 @@ Example of `level=100`, `x0=5`, `y0=5`:
 ![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/grie.png "grie")
 
 
-## Results of fitting the 2d benchmark functions
+## Results of fitting the 2D benchmark functions
 
 Some experimental outputs for 2D (two decision variables). 
 
@@ -159,6 +163,12 @@ Retrieved scattergram (useful for uncertainty estimation)
 
 ![grie_scatter](https://github.com/ipo-exe/evolvelab/blob/main/docs/grie_scatter.png "grie scatter")
 
+## Results of fitting 8 decision variables
+
+In this experiment, all four benchmark function where merged so the objective function
+was the **average** of each benchmark. 
+
+![mixed_scatter](https://github.com/ipo-exe/evolvelab/blob/main/docs/mixed_scatter.png "mixed scatter")
 
 
 ## References
