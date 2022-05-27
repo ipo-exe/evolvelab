@@ -139,15 +139,15 @@ Retrieved scattergram (useful for uncertainty estimation)
 ### Rastrigin
 Parameters: `N_GEN=100`, `N_POPSIZE=200`, `R_STD=0.4`
 
-![himm_fit](https://github.com/ipo-exe/evolvelab/blob/main/docs/rastr_fitting.gif "rast fitting")
+![rastr_fit](https://github.com/ipo-exe/evolvelab/blob/main/docs/rastr_fitting.gif "rast fitting")
 
 Convergence plot:
 
-![rast_conv](https://github.com/ipo-exe/evolvelab/blob/main/docs/rast_conv.png "rast convergence")
+![rastr_conv](https://github.com/ipo-exe/evolvelab/blob/main/docs/rastr_conv.png "rast convergence")
 
 Retrieved scattergram (useful for uncertainty estimation)
 
-![rast_scatter](https://github.com/ipo-exe/evolvelab/blob/main/docs/rast_scatter.png "rast scatter")
+![rastr_scatter](https://github.com/ipo-exe/evolvelab/blob/main/docs/rastr_scatter.png "rast scatter")
 
 
 
