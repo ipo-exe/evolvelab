@@ -2,12 +2,13 @@
 Evolutionary computing lab. For evolutionary computing stuff and experiments.
 
 ## The evolutionary algorithm
-The algorithm is based on the [evolution strategy](https://en.wikipedia.org/wiki/Evolution_strategy) framework, so there is only three rules:
+The algorithm is based on the [evolution strategy](https://en.wikipedia.org/wiki/Evolution_strategy)
+framework, so there is only three main rules:
 1. change all current solutions by adding a normally distributed random vector (variation operator).
 2. merge the changed solutions with the original ones (offspring recruitment).
 3. select only the set of best solutions (elitism).
 
-Solutions are encoded in the integer format (i.e., fixed searching grid). 
+Solutions are encoded in the integer format (i.e., a fixed searching grid). 
 There is two options :
 1. coarse grid: `uint8` 8 bit encoding, varying from 0 to 255.
 2. fine grid: `uint16` 16 bit encoding, varying from 0 to 65535.
@@ -32,9 +33,9 @@ The algorithm is designed both for optimization and exploration.
 When `EXPLORE = TRUE`, the procedure is set to find solutions within a certain range of the fitness score.
 When `EXPLORE = FALSE`, the procedure is set to find solution that maximize (or minimize) the fitness score.
 
-The algoritm algorithm lives in the `evolve()` function of the `evolution.py` file.
+The algoritm lives in the `evolve()` function of the `evolution.py` file.
 It is designed to optimize any number of decision variables. 
-Custom objective functions can used.
+Custom objective functions can be further used.
 
 The pseudo-code:
 ```markdown
