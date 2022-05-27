@@ -199,7 +199,64 @@ def griewank_2d_plots(folder='C:/bin', filename='view_himm', suff='', show=True,
         return filepath
 
 
-def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
+def pannel_nd_scattergram(df_dvars, df_trace, s_ttl,
+                          folder='C:/bin',
+                          filename='scattergram',
+                          suff='',
+                          show=True,
+                          dark=True):
+
+    marker_color = 'k'
+    z_cmap = 'Spectral'
+    if dark:
+        plt.style.use('dark_background')
+        marker_color = 'white'
+        z_cmap = 'inferno'
+
+    fig = plt.figure(figsize=(14, 6), )  # Width, Height
+    fig.suptitle(s_ttl)
+
+    # smart gridding
+    n_cols = len(df_dvars)
+    n_rows = 1
+    if len(df_dvars) > 4:
+        n_cols = 4
+        n_div = len(df_dvars) // 4
+        n_rem = len(df_dvars) % 4
+        if n_rem > 0: ## odd number
+            n_rows = n_div + 1
+        else:
+            n_rows = n_div
+    gs = mpl.gridspec.GridSpec(n_rows, n_cols, wspace=0.1, hspace=0.1, left=0.05, right=0.95, bottom=0.1, top=0.9)
+
+    counter = 0
+    for i in range(n_rows):
+        for j in range(n_cols):
+            if counter == len(df_dvars):
+                break
+            lcl_var = df_dvars['Labels'].values[counter]
+            ax = fig.add_subplot(gs[i, j])
+            plt.plot(df_trace[lcl_var], df_trace['Score'], '.', c=marker_color, alpha=0.2)
+            plt.xlabel(lcl_var)
+            plt.xlim((df_dvars['Lo'].values[counter], df_dvars['Hi'].values[counter]))
+            counter = counter + 1
+
+    if show:
+        plt.show()
+        plt.close(fig)
+    else:
+        # export file
+        if suff == '':
+            filepath = folder + '/' + filename + '.png'
+        else:
+            filepath = folder + '/' + filename + '_' + suff + '.png'
+        plt.savefig(filepath)
+        plt.close(fig)
+        return filepath
+
+
+
+def pannel_2d_generation(df_trace, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
                          x_lbl='X', y_lbl='Y', folder='C:/bin', suff='', show=True, dark=True):
 
     marker_color = 'k'
@@ -209,10 +266,10 @@ def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
         marker_color = 'white'
         z_cmap = 'inferno'
 
-    if trace_df['Score'].min() > 0:
+    if df_trace['Score'].min() > 0:
         zmin = 0
     else:
-        zmin = trace_df['Score'].min()
+        zmin = df_trace['Score'].min()
 
     zmax = np.max(zs)
 
@@ -236,13 +293,13 @@ def pannel_2d_generation(trace_df, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
     plt.ylabel('y')
     aux_a = (len(zs[0]) / (hi - lo))
     aux_b = -aux_a * lo
-    plt.scatter(x=(aux_a * trace_df[x_lbl]) + aux_b,
-                y=(aux_a * trace_df[y_lbl]) + aux_b,
+    plt.scatter(x=(aux_a * df_trace[x_lbl]) + aux_b,
+                y=(aux_a * df_trace[y_lbl]) + aux_b,
                 marker='+', c='darkgrey', zorder=2)
     # plot 2
     ax = fig.add_subplot(gs[:2, 2])
-    plt.scatter(x=trace_df[x_lbl],
-                y=trace_df['Score'],
+    plt.scatter(x=df_trace[x_lbl],
+                y=df_trace['Score'],
                 color=marker_color,
                 alpha=0.3,
                 edgecolors='none')
