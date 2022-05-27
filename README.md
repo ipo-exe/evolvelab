@@ -128,6 +128,15 @@ Parameters: `N_GEN=100`, `N_POPSIZE=100`, `R_STD=0.7`
 
 ![himm_fit](https://github.com/ipo-exe/evolvelab/blob/main/docs/himm_fitting.gif "himm fitting")
 
+Convergence plot:
+
+![himm_conv](https://github.com/ipo-exe/evolvelab/blob/main/docs/himm_conv.png "himm convergence")
+
+Retrieved scattergram (useful for uncertainty estimation)
+
+![himm_scatter](https://github.com/ipo-exe/evolvelab/blob/main/docs/himm_scatter.png "himm scatter")
+
+
 
 ## References
 

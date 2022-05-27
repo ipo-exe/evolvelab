@@ -41,7 +41,7 @@ def evolution_nd_recipe():
         folder = 'C:/bin'
 
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus', 'griewank', 'mixed']
-    kind = kinds[3]
+    kind = kinds[1]
     wkpl = True
     label = kind
     # folder setup
@@ -57,7 +57,7 @@ def evolution_nd_recipe():
     hi_y = 5
     mid = 0
     popsize = 200
-    r_std = 0.5
+    r_std = 0.4
     trace = True
     # definir df
     if kind == 'mixed':
@@ -163,7 +163,7 @@ def evolution_2d_recipe():
         folder = 'C:/bin'
 
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus', 'griewank']
-    kind = kinds[2]
+    kind = kinds[1]
     wkpl = True
     label = kind
     # folder setup
@@ -178,8 +178,8 @@ def evolution_2d_recipe():
     lo_y = -5
     hi_y = 5
     mid = 0
-    popsize = 100
-    r_std = 0.8
+    popsize = 200
+    r_std = 0.4
     trace = True
     # definir df
     df_dvars = pd.DataFrame({'Lo': [lo_x, lo_y],
