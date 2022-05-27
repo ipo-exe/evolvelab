@@ -227,7 +227,7 @@ def pannel_nd_scattergram(df_dvars, df_trace, s_ttl,
             n_rows = n_div + 1
         else:
             n_rows = n_div
-    gs = mpl.gridspec.GridSpec(n_rows, n_cols, wspace=0.1, hspace=0.1, left=0.05, right=0.95, bottom=0.1, top=0.9)
+    gs = mpl.gridspec.GridSpec(n_rows, n_cols, wspace=0.2, hspace=0.25, left=0.05, right=0.95, bottom=0.1, top=0.9)
 
     counter = 0
     for i in range(n_rows):
@@ -322,14 +322,24 @@ def pannel_2d_generation(df_trace, xs, ys, zs, g, hi, lo, lo_x, hi_x, popsize,
         return filepath
 
 
-def convergence(curve_df, folder='C:/bin', filename='convergence', suff='', show=True):
+def convergence(curve_df, folder='C:/bin', filename='convergence', suff='', show=True, dark=True):
+
+    marker_color = 'black'
+    color_median = 'tab:red'
+    color_range = 'lightsteelblue'
+    if dark:
+        plt.style.use('dark_background')
+        marker_color = 'white'
+        color_median = 'cyan'
+        color_range = 'silver'
+
     fig = plt.figure(figsize=(7, 5), )  # Width, Height
-    plt.plot(curve_df['Gen'], curve_df['Best_S'], 'k.', label='best')
-    plt.plot(curve_df['Gen'], curve_df['p50'], 'tab:red', label='median')
+    plt.plot(curve_df['Gen'], curve_df['Best_S'], '.', c=marker_color, label='best')
+    plt.plot(curve_df['Gen'], curve_df['p50'], c=color_median, label='median')
     plt.fill_between(x=curve_df['Gen'],
                      y1=curve_df['p05'],
                      y2=curve_df['p95'],
-                     color='lightsteelblue',
+                     color=color_range,
                      label='90% range')
     plt.legend(loc='lower right')
     plt.ylabel('Score')

@@ -41,7 +41,7 @@ def evolution_nd_recipe():
         folder = 'C:/bin'
 
     kinds = ['paraboloid', 'rastrigin', 'himmelblaus', 'griewank', 'mixed']
-    kind = kinds[4]
+    kind = kinds[3]
     wkpl = True
     label = kind
     # folder setup
@@ -50,7 +50,7 @@ def evolution_nd_recipe():
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
     # parameters setup
-    generations = 50
+    generations = 100
     lo_x = -5
     hi_x = 5
     lo_y = -5
@@ -107,21 +107,23 @@ def evolution_nd_recipe():
                               filename='behavioural',
                               folder=folder,
                               show=False)
-        # plot generations frames
-        for g in range(generations):
-            # plot images
-            status('plot {}'.format(g))
-            lcl_df = trace_df.query('Gen == {}'.format(g))
-            # plot
-            filename = 'G' + str(g).zfill(6)
-            pannel_nd_scattergram(df_dvars=df_dvars,
-                                  df_trace=lcl_df,
-                                  s_ttl='Generation = {}'.format(g),
-                                  filename=filename,
-                                  folder=folder,
-                                  show=False)
-        status('plotting gif')
-        export_gif(dir_output=folder, dir_images=folder, nm_gif='animation', kind='png', suf='G')
+        animate = False
+        if animate:
+            # plot generations frames
+            for g in range(generations):
+                # plot images
+                status('plot {}'.format(g))
+                lcl_df = trace_df.query('Gen == {}'.format(g))
+                # plot
+                filename = 'G' + str(g).zfill(6)
+                pannel_nd_scattergram(df_dvars=df_dvars,
+                                      df_trace=lcl_df,
+                                      s_ttl='Generation = {}'.format(g),
+                                      filename=filename,
+                                      folder=folder,
+                                      show=False)
+            status('plotting gif')
+            export_gif(dir_output=folder, dir_images=folder, nm_gif='animation', kind='png', suf='G')
 
 
     # auto open folder
@@ -170,7 +172,7 @@ def evolution_2d_recipe():
             label = label + '_'
         folder = create_rundir(label=label + 'EC', wkplc=folder)
     # parameters setup
-    generations = 20
+    generations = 100
     lo_x = -5
     hi_x = 5
     lo_y = -5
@@ -190,8 +192,8 @@ def evolution_2d_recipe():
                  b_trace=trace,
                  r_std=r_std,
                  kind = kind,
-                 b_coarse=True,
-                 b_explore=True,
+                 b_coarse=False,
+                 b_explore=False,
                  upper=80,
                  lower=40)
 
@@ -267,6 +269,5 @@ def evolution_2d_recipe():
     else:  # fall to windows
         os.startfile(folder)
 
-evolution_nd_recipe()
-
-#view_function()
+#evolution_nd_recipe()
+evolution_2d_recipe()

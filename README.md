@@ -119,6 +119,16 @@ Example of `level=100`, `x0=5`, `y0=5`:
 ![parab](https://github.com/ipo-exe/evolvelab/blob/main/docs/grie.png "grie")
 
 
+## Results of fitting the 2d benchmark functions
+
+Some experimental outputs for 2D (two decision variables). 
+
+### Himmelblaus
+Parameters: `N_GEN=100`, `N_POPSIZE=100`, `R_STD=0.7`
+
+![himm_fit](https://github.com/ipo-exe/evolvelab/blob/main/docs/himm_fitting.gif "himm fitting")
+
+
 ## References
 
 Beyer, HG., Schwefel, HP. Evolution strategies – A comprehensive introduction. Natural Computing 1, 3–52 (2002). https://doi.org/10.1023/A:1015059928466
