@@ -149,6 +149,16 @@ Retrieved scattergram (useful for uncertainty estimation)
 
 ![rastr_scatter](https://github.com/ipo-exe/evolvelab/blob/main/docs/rastr_scatter.png "rast scatter")
 
+### Parabola
+Retrieved scattergram (useful for uncertainty estimation)
+
+![parab_scatter](https://github.com/ipo-exe/evolvelab/blob/main/docs/parab_scatter.png "parab scatter")
+
+### Griewank
+Retrieved scattergram (useful for uncertainty estimation)
+
+![grie_scatter](https://github.com/ipo-exe/evolvelab/blob/main/docs/grie_scatter.png "grie scatter")
+
 
 
 ## References
