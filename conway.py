@@ -105,12 +105,40 @@ def get_window(lcl_i, lcl_j, size_i, size_j):
     return dct_w
 
 
-def compute_next(current):
-    m_next = current.copy()
-    for i in range(len(current)):
-        for j in range(len(current[i])):
+def compute_next(grd):
+    # copy current array
+    m_next = grd.copy()
+    # scanning loop
+    for i in range(len(grd)): # rows
+        for j in range(len(grd[i])): # columns
+
+            # get window dict coordinates
+            dw = get_window(lcl_i=i, lcl_j=j, size_i=len(grd), size_j=len(grd[i]))
+
+            # define indexed window map object
+            dct_w = {'0': grd[dw['nw']['y']][dw['nw']['x']],
+                     '1': grd[dw['n']['y']][dw['n']['x']],
+                     '2': grd[dw['ne']['y']][dw['ne']['x']],
+                     '3': grd[dw['w']['y']][dw['w']['x']],
+                     '4': grd[dw['e']['y']][dw['e']['x']],
+                     '5': grd[dw['sw']['y']][dw['sw']['x']],
+                     '6': grd[dw['s']['y']][dw['s']['x']],
+                     '7': grd[dw['se']['y']][dw['se']['x']]}
+
+            # define flat window array
+            window = np.array([dct_w['0'],
+                               dct_w['1'],
+                               dct_w['2'],
+                               dct_w['3'],
+                               dct_w['4'],
+                               dct_w['5'],
+                               dct_w['6'],
+                               dct_w['7']
+                               ])
+            '''
+            # get window dict
             dw = get_window(lcl_i=i, lcl_j=j, size_i=len(current), size_j=len(current[i]))
-            # get window
+            # access window
             window = np.array([current[dw['nw']['y']][dw['nw']['x']],
                                current[dw['n']['y']][dw['n']['x']],
                                current[dw['ne']['y']][dw['ne']['x']],
@@ -120,9 +148,12 @@ def compute_next(current):
                                current[dw['s']['y']][dw['s']['x']],
                                current[dw['se']['y']][dw['se']['x']]
                                ])
+            '''
+
+            # apply rules
             window_sum = np.sum(window)
             # live cell
-            if current[i][j] == 1:
+            if grd[i][j] == 1:
                 if window_sum == 2 or window_sum == 3:
                     m_next[i][j] = 1
                 else:
@@ -137,7 +168,7 @@ def play(grd_int, n_gens, n_grid=100):
     grid = np.zeros(shape=(n_gens, n_grid, n_grid), dtype='int8')
     grid[0] = grd_int
     for i in range(1, len(grid)):
-        grid[i] = compute_next(current=grid[i - 1])
+        grid[i] = compute_next(grd=grid[i - 1])
     return grid
 
 
@@ -162,7 +193,7 @@ def live():
 
     def beat(i):
         global grd
-        grd = compute_next(current=grd) #1 * (np.random.random(size=(100, 100)) > r_density) #
+        grd = compute_next(grd=grd) #1 * (np.random.random(size=(100, 100)) > r_density) #
         ax1.clear()
         plt.imshow(grd, cmap='Greys_r')
 
@@ -172,9 +203,11 @@ def live():
     plt.show()
 
 
+'''
 n_seed = 555
 n_grid = 100
 np.random.seed(n_seed)
 r_density = 0.1
 grd = np.array(1 * (np.random.random(size=(n_grid, n_grid)) < r_density), dtype='int8')
 live()
+'''
